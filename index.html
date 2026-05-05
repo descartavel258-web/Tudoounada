@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#00cc88">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sasol">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/xitiquemz-e295c.appspot.com/o/icon-192.png?alt=media">
+<title>Sasol - Poupança Digital</title>
+<!-- Firebase SDKs -->
+<script type="module">
+  // Import Firebase SDKs
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set, push, update, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { getAuth, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyAr_naF8pZIumtpzDyU43sw9dzwvegWts0",
+    authDomain: "xitiquemz-e295c.firebaseapp.com",
+    databaseURL: "https://xitiquemz-e295c-default-rtdb.firebaseio.com",
+    projectId: "xitiquemz-e295c",
+    storageBucket: "xitiquemz-e295c.firebasestorage.app",
+    messagingSenderId: "822220496963",
+    appId: "1:822220496963:web:c3a7ded7143c25d51974f6",
+    measurementId: "G-KT81XW92W5"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const auth = getAuth(app);
+
+  // Make Firebase available globally
+  window.firebaseDB = db;
+  window.firebaseRef = ref;
+  window.firebaseOnValue = onValue;
+  window.firebaseSet = set;
+  window.firebasePush = push;
+  window.firebaseUpdate = update;
+  window.firebaseGet = get;
+  window.firebaseChild = child;
+  window.firebaseAuth = auth;
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#03080f;--s1:#060d18;--s2:#0a1422;--s3:#0f1c2e;--s4:#141f38;
+  --border:#0e2040;--border2:#1a3a6a;
+  --green:#2080e0;--gd:#2080e018;--gd2:#2080e00a;--gd3:#2080e035;
+  --gold:#a8ccff;--yd:#a8ccff12;--yd2:#a8ccff25;
+  --blue:#5ab8ff;--bd:#5ab8ff18;
+  --red:#ff4757;--rd:#ff475715;
+  --purple:#3a8fff;--pd:#3a8fff18;
+  --cyan:#7dd4ff;--cd:#7dd4ff12;
+  --text:#d8eaff;--t2:#3a6095;--t3:#0a1c3a;
+  --r:20px;--rs:14px;--sh:0 20px 60px #00000088;
+  --navy:#03080f;--navy2:#06101e;--gold2:#5ab8ff;--trust:#2080e0
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;overscroll-behavior:none}
+.fd{font-family:'Space Grotesk',sans-serif;font-weight:700}
+.hidden{display:none!important}
+.screen{display:none;height:100vh;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+.page{display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:90px}
+.page.active{display:block}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinR{to{transform:rotate(-360deg)}}
+@keyframes loadBar{0%{width:0;opacity:1}85%{width:90%;opacity:1}100%{width:100%;opacity:0}}
+@keyframes glow{0%,100%{box-shadow:0 0 30px #2080e030,0 0 60px #2080e010}50%{box-shadow:0 0 60px #2080e060,0 0 100px #2080e025}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes coinSpin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
+.anim{animation:fadeUp .35s cubic-bezier(.16,1,.3,1)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--green);border-radius:2px;opacity:.3}
+
+/* TOAST */
+#tc{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:92%}
+.toast{background:rgba(7,13,18,.95);border:1px solid var(--border2);border-radius:50px;padding:12px 24px;font-size:13px;font-weight:600;animation:fadeUp .3s cubic-bezier(.16,1,.3,1);text-align:center;box-shadow:0 8px 40px #00000099;max-width:360px;backdrop-filter:blur(20px)}
+.toast.ok{border-color:var(--green);color:var(--green);box-shadow:0 8px 40px #00e89620}
+.toast.err{border-color:var(--red);color:var(--red);box-shadow:0 8px 40px #ff475720}
+.toast.inf{border-color:var(--blue);color:var(--blue)}
+
+/* MODAL */
+.mo{position:fixed;inset:0;background:#00000099;backdrop-filter:blur(16px);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.mo.active{display:flex}
+.mb{background:linear-gradient(180deg,#0c1318,#070d12);border-radius:28px 28px 0 0;border-top:1px solid var(--border2);width:100%;max-width:460px;padding:22px 22px 36px;max-height:88vh;overflow-y:auto;animation:slideUp .35s cubic-bezier(.16,1,.3,1)}
+.mh{width:44px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 22px}
+.mt{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin-bottom:20px;letter-spacing:-.3px}
+
+/* FIELDS */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+.field input,.field select{width:100%;background:var(--s2);border:1.5px solid var(--border);color:var(--text);border-radius:var(--rs);padding:14px 16px;font-family:inherit;font-size:14px;outline:none;transition:all .2s;-webkit-appearance:none}
+.field input:focus,.field select:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--gd);background:var(--s3)}
+.field select option{background:var(--s2)}
+.pfx{position:relative}.pfx input{padding-left:58px}
+.pfx::before{content:'+258';position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--green);font-weight:700;font-size:12px;z-index:1}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;border-radius:var(--rs);padding:14px 20px;transition:all .25s cubic-bezier(.16,1,.3,1);width:100%;letter-spacing:.01em}
+.bg{background:linear-gradient(135deg,#1a5fb5,#2e82e0,#4a9eff);color:#fff;box-shadow:0 4px 24px #4a9eff30}
+.bg:hover{transform:translateY(-2px);box-shadow:0 8px 40px #4a9eff55}
+.bg:active{transform:translateY(0)}
+.bgh{background:var(--s2);color:var(--text);border:1.5px solid var(--border)}.bgh:hover{border-color:var(--green);background:var(--s3)}
+.br{background:var(--rd);color:var(--red);border:1.5px solid var(--red)}
+.bsm{padding:9px 16px;font-size:12px;width:auto;border-radius:10px}
+.bbl{background:var(--bd);color:var(--blue);border:1.5px solid var(--blue)}
+.bgo{background:var(--yd);color:var(--gold);border:1.5px solid var(--gold)}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:460px;background:rgba(7,13,18,.92);border-top:1px solid var(--border);display:grid;padding:8px 0 24px;z-index:100;backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
+.bnav.n5{grid-template-columns:repeat(5,1fr)}
+.ni{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:7px 2px;border:none;background:none;color:var(--t2);font-family:inherit;font-size:9px;font-weight:700;transition:all .2s;text-transform:uppercase;letter-spacing:.04em}
+.ni.active{color:var(--green)}
+.ni.active svg{filter:drop-shadow(0 0 6px var(--green))}
+.ni svg{width:22px;height:22px;transition:transform .2s}
+.ni:hover svg{transform:translateY(-2px)}
+.pw{max-width:460px;margin:0 auto;width:100%}
+
+/* LOADING SCREEN */
+#s-load{background:radial-gradient(ellipse 80% 60% at 50% 40%,#001535,transparent 70%),var(--bg)}
+.load-wrap{text-align:center;padding:20px}
+.load-coin-wrap{position:relative;width:110px;height:110px;margin:0 auto 28px}
+.load-ring1{position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:#2080e0;border-right-color:#7dd4ff;animation:spin 1.5s linear infinite}
+.load-ring2{position:absolute;inset:10px;border-radius:50%;border:1.5px solid transparent;border-bottom-color:#2080e0;border-left-color:#5ab8ff;opacity:.5;animation:spinR 2.2s linear infinite}
+.load-coin{position:absolute;inset:20px;background:linear-gradient(135deg,#06285a,#1060c0,#2080e0,#1060c0);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:glow 2.5s ease infinite}
+.load-coin svg{width:36px;height:36px;color:#fff;filter:drop-shadow(0 2px 4px #00000040)}
+.load-title{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.5px;background:linear-gradient(135deg,#1a70d0,#4fa8ff,#a0d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.load-sub{color:var(--t2);font-size:12px;margin-top:6px;letter-spacing:.15em;text-transform:uppercase}
+.load-bar-track{width:140px;height:2px;background:var(--border);border-radius:2px;margin:24px auto 0;overflow:hidden}
+.load-bar-fill{height:100%;background:linear-gradient(90deg,#1a70d0,#2080e0,#7dd4ff);border-radius:2px;animation:loadBar 2.2s cubic-bezier(.4,0,.2,1) forwards}
+
+/* AUTH */
+#sa{background:radial-gradient(ellipse 80% 60% at 20% 20%,#001535,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,#051020,transparent 60%),var(--bg);align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.aw{width:100%;max-width:390px}
+.alo{text-align:center;margin-bottom:36px}
+.ali{width:90px;height:90px;background:transparent;border-radius:26px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:none;animation:float 3s ease-in-out infinite}
+.ali svg{width:44px;height:44px;color:#fff;filter:drop-shadow(0 2px 8px #00000040)}
+.alo h1{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.5px;background:linear-gradient(135deg,#4fa8ff,#a0d4ff,#ffffff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.alo p{color:var(--t2);margin-top:6px;font-size:13px;letter-spacing:.02em}
+.ac{background:linear-gradient(160deg,#0c1318,#07090d);border:1.5px solid var(--border2);border-radius:26px;padding:28px;box-shadow:0 20px 80px #000000aa,inset 0 1px 0 #ffffff08}
+.ats{display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:14px;padding:4px;margin-bottom:24px;gap:4px;border:1px solid var(--border)}
+.at{padding:12px;border:none;background:none;color:var(--t2);font-family:inherit;font-weight:700;font-size:13px;border-radius:11px;cursor:pointer;transition:all .25s}
+.at.active{background:linear-gradient(135deg,#0a2a6e,#1a5fb5);color:#fff;box-shadow:0 4px 16px #4a9eff40}
+.af{display:none}.af.active{display:block}
+.terms{font-size:11px;color:var(--t2);text-align:center;margin-top:14px;line-height:1.7}
+.terms a{color:var(--green);text-decoration:none}
+
+/* HOME HEADER */
+.hh{background:linear-gradient(175deg,#010f28 0%,#03102a 55%,var(--bg) 100%);padding:52px 18px 22px;position:relative;overflow:hidden;flex-shrink:0}
+.hh::before{content:'';position:absolute;top:-100px;right:-80px;width:320px;height:320px;background:radial-gradient(circle,#2080e018,transparent 70%);border-radius:50%}
+.hh::after{content:'';position:absolute;bottom:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,#5ab8ff0a,transparent 70%);border-radius:50%}
+.htop{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px}
+.hgreet{font-size:11px;color:#3a6095;margin-bottom:3px;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.hname{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.2px;color:var(--text)}
+.hlvl{display:flex;flex-direction:column;align-items:center;gap:3px;background:linear-gradient(135deg,#021530,#0a2a5a);border:1px solid #2080e040;border-radius:16px;padding:10px 14px;cursor:pointer;transition:all .25s}
+.hlvl:hover{border-color:var(--green);box-shadow:0 0 20px #2080e030}
+.hlvl-icon{width:28px;height:28px;background:linear-gradient(135deg,#0a4090,#2080e0);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.hlvl-icon svg{width:14px;height:14px;color:#ffffff}
+.hlvl-lbl{font-size:9px;font-weight:800;color:#5ab8ff;text-transform:uppercase;letter-spacing:.08em}
+.hlvl-num{font-size:11px;color:#a0d4ff;font-weight:700}
+
+/* BALANCE CARD */
+.bc{background:linear-gradient(135deg,#031228,#010e20);border:1px solid #4a9eff22;border-radius:24px;padding:24px;margin:0 18px;position:relative;z-index:1;box-shadow:0 12px 60px #00000088,inset 0 1px 0 #4a9eff18,0 0 80px #4a9eff06}
+.bc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#4fa8ff60,transparent);border-radius:24px 24px 0 0}
+.bcl{font-size:11px;color:#3a6080;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.bca{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;color:#fff;letter-spacing:-.5px;line-height:1}
+.bca span{font-size:18px;color:#7dd4ff;font-weight:400;margin-left:4px}
+.bcs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid #4a9eff12}
+.bsl{font-size:9px;color:#3a6080;margin-bottom:3px;text-transform:uppercase;letter-spacing:.07em;font-weight:700}
+.bsv{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:#fff}
+.bsv.up{color:var(--green)}.bsv.gd{color:var(--gold)}
+.bccd{margin-top:16px;padding-top:16px;border-top:1px solid #4a9eff12;display:flex;align-items:center;justify-content:space-between}
+.bccl{font-size:11px;color:#3a6080}
+.bcct{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--blue)}
+
+/* QUICK ACTIONS */
+.qa{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:20px 18px 0}
+.qi{display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;padding:16px 6px;background:linear-gradient(160deg,var(--s1),var(--s2));border:1px solid var(--border);border-radius:20px;transition:all .25s cubic-bezier(.16,1,.3,1)}
+.qi:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 10px 30px #00000044}
+.qi-ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.qi-ic svg{width:22px;height:22px}
+.qi-lb{font-size:9px;font-weight:800;color:var(--t2);text-align:center;text-transform:uppercase;letter-spacing:.04em}
+
+/* SECTIONS */
+.sec{padding:20px 18px 0}
+.stitle{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;letter-spacing:-.2px}
+.dot{width:8px;height:8px;background:#2080e0;border-radius:50%;animation:blink 2s infinite;box-shadow:0 0 8px #2080e0}
+
+/* NOTICE */
+.notice{display:flex;align-items:flex-start;gap:12px;padding:16px;background:linear-gradient(135deg,var(--yd),#f5c51808);border:1px solid #f5c51820;border-radius:var(--rs);margin-bottom:10px}
+.notice svg{width:18px;height:18px;color:var(--gold);flex-shrink:0;margin-top:1px}
+.notice p{font-size:12px;color:#c8a020;line-height:1.6}
+
+/* FEED */
+.fi{display:flex;align-items:center;gap:12px;padding:14px;background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--border);border-radius:16px;margin-bottom:8px;animation:fadeUp .4s cubic-bezier(.16,1,.3,1)}
+.fa{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0}
+.ft{flex:1;font-size:12px;line-height:1.4}.ft strong{color:var(--text)}
+.ftime{font-size:10px;color:var(--t2)}
+
+/* TASK CARD */
+.tc2{background:linear-gradient(135deg,#0a1830,#060e20);border:1px solid #3d8bff22;border-radius:22px;padding:20px;box-shadow:inset 0 1px 0 #3d8bff15}
+.thdr{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.tic{width:44px;height:44px;background:var(--bd);border:1px solid var(--blue);border-radius:13px;display:flex;align-items:center;justify-content:center}
+.tic svg{width:22px;height:22px;color:var(--blue)}
+.trw{background:var(--yd);color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:800;margin-left:auto}
+.tpb{height:6px;background:var(--s3);border-radius:3px;margin:14px 0 10px;overflow:hidden}
+.tpbi{height:100%;background:linear-gradient(90deg,#1060c0,#5ab8ff);border-radius:3px;transition:width .6s cubic-bezier(.16,1,.3,1)}
+.tmeta{display:flex;justify-content:space-between;font-size:11px;color:var(--t2)}
+
+/* NO LEVEL */
+.nlw{background:linear-gradient(135deg,#040e28,#020a1c);border:1px solid #2080e020;border-radius:22px;padding:22px;text-align:center}
+.nlw-ic{width:56px;height:56px;background:var(--bd);border:1px solid var(--blue);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.nlw-ic svg{width:28px;height:28px;color:var(--blue)}
+.nlw h3{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px}
+.nlw p{font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:16px}
+
+/* DEPOSIT */
+.dh{padding:52px 18px 22px;background:linear-gradient(160deg,#010f28,var(--bg));flex-shrink:0}
+.dh h2{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.3px}
+.dh p{color:var(--t2);font-size:13px;margin-top:4px}
+.lvl-grid{display:flex;flex-direction:column;gap:12px;padding:20px}
+.lvl-card{background:linear-gradient(160deg,var(--s1),var(--s2));border:1.5px solid var(--border);border-radius:22px;padding:20px;cursor:pointer;transition:all .25s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden}
+.lvl-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:22px 22px 0 0;opacity:0;transition:opacity .25s}
+.lvl-card:hover,.lvl-card.sel{border-color:var(--green);background:linear-gradient(160deg,#030f28,#020818);transform:translateY(-2px);box-shadow:0 12px 40px #00000066}
+.lvl-card:hover::before,.lvl-card.sel::before{opacity:1;background:linear-gradient(90deg,var(--green),var(--cyan))}
+.lvl-card.active-lvl{border-color:var(--gold)!important;background:linear-gradient(160deg,#1a1200,#0e0900)!important;box-shadow:0 0 40px #f5c51815!important}
+.lvl-card.active-lvl::before{opacity:1!important;background:linear-gradient(90deg,var(--gold),#ffd060)!important}
+.lvl-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.lvl-badge{display:flex;align-items:center;gap:10px}
+.lvl-num{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px}
+.lvl-name{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;letter-spacing:-.1px}
+.lvl-sub{font-size:11px;color:var(--t2);margin-top:2px}
+.lvl-price{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--green)}
+.lvl-price span{font-size:13px;color:var(--t2);font-weight:400}
+.lvl-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.lvl-stat-l{font-size:10px;color:var(--t2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.lvl-stat-v{font-size:13px;font-weight:800;color:var(--text)}
+.lvl-current-tag{position:absolute;top:14px;right:14px;background:linear-gradient(135deg,#a06000,var(--gold));color:#1a0a00;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px}
+
+/* DEP CONFIRM */
+.dep-confirm{padding:20px}
+.dep-confirm-card{background:linear-gradient(135deg,#001f12,#00150c);border:1px solid #00e89625;border-radius:24px;padding:24px;margin-bottom:20px;text-align:center;box-shadow:0 8px 40px #00e89610}
+.dep-confirm-lvl{font-size:11px;color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.dep-confirm-name{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px}
+.dep-confirm-price{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;color:var(--green)}
+.dep-confirm-price span{font-size:18px;color:var(--t2)}
+.dep-confirm-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;padding-top:18px;border-top:1px solid #00e89615}
+.dcs-l{font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-weight:700}
+.dcs-v{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#fff}
+.rules-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:16px;margin-bottom:18px}
+.rules-card h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin-bottom:12px}
+.rule{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.rule:last-child{margin-bottom:0}
+.rule-dot{width:7px;height:7px;background:var(--blue);border-radius:50%;flex-shrink:0;margin-top:6px}
+.rule p{font-size:12px;color:var(--t2);line-height:1.6}
+.pay-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px}
+.pay-card h4{font-family:'Space Grotesk',sans-serif;font-size:14px;margin-bottom:14px;font-weight:700}
+.prow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.prow:last-child{border-bottom:none}
+.prl{font-size:11px;color:var(--t2);font-weight:600}
+.prv{font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px}
+.cpb{background:var(--bd);border:none;cursor:pointer;color:var(--blue);font-size:10px;font-weight:800;padding:4px 10px;border-radius:8px;font-family:inherit}
+.m-method{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.mm{background:var(--s1);border:2px solid var(--border);border-radius:18px;padding:18px 12px;cursor:pointer;transition:all .25s;text-align:center}
+.mm.sel{border-color:var(--green);background:var(--gd2);box-shadow:0 0 20px #00e89615}
+.mm-logo{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-weight:800;font-size:12px;letter-spacing:-.5px}
+.mp-logo{background:linear-gradient(135deg,#cc2020,#8b1010);color:#fff}
+.em-logo{background:linear-gradient(135deg,#1f60d0,#1040a0);color:#fff}
+.mm-name{font-weight:700;font-size:13px;font-family:'Space Grotesk',sans-serif}
+.mm-sub{font-size:10px;color:var(--t2);margin-top:2px}
+
+/* WALLET */
+.wh{padding:52px 18px 24px;background:linear-gradient(160deg,#060f22,#030a16);flex-shrink:0}
+.whl{font-size:11px;color:#3a6095;margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.wha{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;color:#a0d4ff;letter-spacing:-.5px}
+.wha span{font-size:18px;color:#3a6095;margin-left:4px}
+.txn{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.txi{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.txi.dep{background:var(--gd)}.txi.dep svg{color:var(--green)}
+.txi.wth{background:var(--rd)}.txi.wth svg{color:var(--red)}
+.txi.rwd{background:var(--yd)}.txi.rwd svg{color:var(--gold)}
+.txi.ref{background:var(--pd)}.txi.ref svg{color:var(--purple)}
+.txi svg{width:18px;height:18px}
+.txi2{flex:1}
+.txtype{font-weight:700;font-size:13px}
+.txdate{font-size:10px;color:var(--t2);margin-top:2px}
+.txst{font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;margin-top:4px;display:inline-block;letter-spacing:.04em}
+.st-p{background:var(--yd);color:var(--gold)}
+.st-a{background:var(--gd);color:var(--green)}
+.st-r{background:var(--rd);color:var(--red)}
+.txamt{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px}
+.txamt.pos{color:var(--green)}.txamt.neg{color:var(--red)}
+
+/* INVITE */
+.ih{padding:52px 18px 24px;background:linear-gradient(160deg,#040d20,var(--bg));flex-shrink:0}
+.ref-card{background:linear-gradient(135deg,#040e28,#020a1c);border:1px solid #2080e025;border-radius:24px;padding:22px;margin-bottom:20px;box-shadow:0 8px 40px #2080e015}
+.rcl{font-size:11px;color:#5ab8ff;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.rcode{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:3px;margin-bottom:14px}
+.rss{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid #2080e018}
+.rsl{font-size:10px;color:#5ab8ff;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.rsv{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:#fff}
+.sbtns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.sbtn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:var(--rs);border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px;transition:all .2s}
+.swa{background:#25d36618;border:1.5px solid #25d366;color:#25d366}.swa:hover{background:#25d36628}
+.slnk{background:var(--s2);border:1.5px solid var(--border);color:var(--text)}.slnk:hover{border-color:var(--green)}
+.rank-item{display:flex;align-items:center;gap:12px;padding:14px;background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--border);border-radius:16px;margin-bottom:8px}
+.rpos{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;width:34px;text-align:center}
+.rpos.gd{color:var(--gold)}.rpos.sv{color:#9ca3af}.rpos.br{color:#b45309}
+.rinfo{flex:1}.rname{font-weight:700;font-size:13px}.rrefs{font-size:11px;color:var(--t2)}
+.rearn{font-family:'Space Grotesk',sans-serif;color:#5ab8ff;font-weight:700}
+
+/* PROFILE */
+.ph{padding:52px 18px 26px;background:linear-gradient(160deg,#0c1820,var(--bg));text-align:center;flex-shrink:0}
+.pav{width:80px;height:80px;border-radius:26px;background:linear-gradient(135deg,#062060,#1060c0,#4fa8ff);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:#fff;box-shadow:0 0 50px #2080e050}
+.pname{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.3px}
+.pphone{color:var(--t2);margin-top:4px;font-size:13px}
+.pbadge{display:inline-flex;align-items:center;gap:6px;background:var(--bd);border:1px solid #4fa8ff40;border-radius:20px;padding:5px 14px;margin-top:10px;font-size:11px;font-weight:800;color:var(--blue)}
+.pmenu{padding:0 18px;margin-bottom:24px}
+.pmtitle{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--t2);margin-bottom:10px;padding-left:4px}
+.pmi{display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,var(--s1),var(--s2));border-bottom:1px solid var(--border);cursor:pointer;transition:all .2s}
+.pmi:first-of-type{border-radius:20px 20px 0 0}
+.pmi:last-of-type{border-radius:0 0 20px 20px;border-bottom:none}
+.pmi:only-child{border-radius:20px}
+.pmi:hover{background:linear-gradient(135deg,var(--s2),var(--s3))}
+.pmi-ic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pmi-ic svg{width:18px;height:18px}
+.pmi-tx{flex:1}.pmi-t{font-weight:700;font-size:13px}.pmi-s{font-size:11px;color:var(--t2);margin-top:2px}
+.arr{color:var(--t2)}.arr svg{width:16px;height:16px}
+
+/* COMO FUNCIONA */
+.cf-card{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--border);border-radius:22px;padding:20px;margin-bottom:12px}
+.cf-card h4{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.cf-step{display:flex;gap:12px;margin-bottom:12px}
+.cf-step:last-child{margin-bottom:0}
+.cf-num{width:28px;height:28px;background:var(--gd);border:1.5px solid var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--green);flex-shrink:0}
+.cf-txt{font-size:12px;line-height:1.7;color:var(--t2);padding-top:4px}
+.cf-txt strong{color:var(--text)}
+.lvl-table{width:100%;border-collapse:collapse;font-size:12px}
+.lvl-table th{text-align:left;padding:10px 12px;background:var(--s2);color:var(--t2);font-weight:800;font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+.lvl-table td{padding:11px 12px;border-bottom:1px solid var(--border);color:var(--text)}
+.lvl-table tr:last-child td{border-bottom:none}
+.lvl-table td:first-child{font-weight:800;color:var(--green)}
+.lvl-table td:nth-child(2){font-family:'Space Grotesk',sans-serif;font-weight:700}
+
+/* ADMIN */
+#sad{background:var(--bg)}
+.adh{background:linear-gradient(135deg,#0c0618,#08101e);padding:52px 18px 16px;flex-shrink:0}
+.adt{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.3px}
+.adb2{display:inline-flex;align-items:center;gap:5px;background:var(--rd);border:1px solid var(--red);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:800;color:var(--red);margin-top:6px}
+.adh-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px}
+.adstats{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 18px}
+.adstat{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--border);border-radius:20px;padding:18px}
+.adstat-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.adstat-v{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
+.adstat-l{font-size:11px;color:var(--t2);margin-top:2px}
+.adtabs{display:flex;padding:0 18px;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none}
+.adtabs::-webkit-scrollbar{display:none}
+.adtab{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--t2);font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .2s}
+.adtab.active{background:var(--gd);border-color:var(--green);color:var(--green)}
+.adcontent{padding:0 18px}
+.adr{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px}
+.adr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.adr-n{font-weight:800;font-size:14px}
+.adr-ph{font-size:11px;color:var(--t2);margin-top:2px}
+.adr-info{font-size:10px;color:var(--t2);margin-top:2px}
+.adr-amt{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px}
+.adr-btns{display:flex;gap:8px}
+.apb{background:var(--gd);color:var(--green);border:1px solid var(--green);border-radius:10px;padding:8px 16px;font-family:inherit;font-size:11px;font-weight:800;cursor:pointer;transition:all .2s}
+.apb:hover{background:var(--green);color:#021a0e}
+.reb{background:var(--rd);color:var(--red);border:1px solid var(--red);border-radius:10px;padding:8px 16px;font-family:inherit;font-size:11px;font-weight:800;cursor:pointer}
+.empty{text-align:center;padding:50px 18px;color:var(--t2)}
+.empty svg{width:48px;height:48px;margin:0 auto 12px;display:block;opacity:.2}
+.empty p{font-size:13px}
+.lim-stat{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:14px;text-align:center}
+.lim-stat-v{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--green)}
+.lim-stat-l{font-size:10px;color:var(--t2);margin-top:2px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:#00e89615;border:1px solid #00e89640;border-radius:20px;padding:4px 12px;font-size:10px;font-weight:800;color:var(--green)}
+.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 1.2s infinite;box-shadow:0 0 6px var(--green)}
+.new-card{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.new-av{width:42px;height:42px;border-radius:13px;background:var(--gd);border:1px solid var(--green);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--green);flex-shrink:0}
+.new-info{flex:1}
+.new-n{font-weight:700;font-size:13px}
+.new-ph{font-size:11px;color:var(--t2);margin-top:2px}
+.new-time{font-size:10px;color:var(--t2);margin-top:2px}
+.lc1{background:var(--gd);color:var(--green)}
+.lc2{background:var(--bd);color:var(--blue)}
+.lc3{background:var(--pd);color:var(--purple)}
+.lc4{background:var(--yd);color:var(--gold)}
+.lc5{background:var(--rd);color:var(--red)}
+@media(min-width:460px){.bnav,.pw,.mo .mb{max-width:460px}}
+
+/* PWA */
+#install-prompt{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:200;background:rgba(6,13,24,.95);border:1px solid #2080e0;border-radius:50px;padding:12px 22px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 40px #00000088,0 0 20px #2080e030;max-width:90%;backdrop-filter:blur(20px)}
+#install-prompt button{background:linear-gradient(135deg,#1060c0,#2080e0);border:none;color:#ffffff;padding:7px 18px;border-radius:30px;font-weight:800;cursor:pointer;font-family:inherit}
+#install-prompt .close-ip{background:none;color:var(--t2);font-size:18px;padding:0 5px;border:none;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="tc"></div>
+
+<!-- LOADING -->
+<div class="screen active" id="s-load" style="align-items:center;justify-content:center">
+  <div class="load-wrap">
+    <div class="load-coin-wrap">
+      <div class="load-ring1"></div>
+      <div class="load-ring2"></div>
+      <div class="load-coin" style="background:linear-gradient(135deg,#ffffff18,#0a2a6e);overflow:hidden;padding:4px">
+        <img src="data:image/jpeg;base64,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" style="width:70px;height:70px;object-fit:contain;border-radius:16px" alt="Sasol">
+      </div>
+    </div>
+    <div class="load-title">Sasol</div>
+    <div class="load-sub">Poupança Digital</div>
+    <div class="load-bar-track"><div class="load-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- PWA Install Prompt -->
+<div id="install-prompt" style="display:none">
+  <span>📱 Instalar App</span>
+  <button id="install-btn">Instalar</button>
+  <button class="close-ip" id="close-ip">✕</button>
+</div>
+
+<!-- AUTH -->
+<div class="screen" id="sa">
+<div class="aw">
+  <div class="alo">
+    <div class="ali" style="background:transparent;box-shadow:none;animation:float 3s ease-in-out infinite">
+      <img src="data:image/jpeg;base64,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" style="width:70px;height:70px;object-fit:contain;border-radius:16px" alt="Sasol">
+    </div>
+    <h1>Sasol</h1>
+    <p>Clube de Poupança Digital — Moçambique</p>
+  </div>
+  <div class="ac">
+    <div class="ats">
+      <button class="at active" onclick="authTab('login')">Entrar</button>
+      <button class="at" onclick="authTab('register')">Registar</button>
+    </div>
+    <div class="af active" id="af-login">
+      <div class="field"><label>Telemóvel</label><div class="pfx"><input type="tel" id="l-ph" placeholder="84 000 0000" maxlength="9" autocomplete="username"></div></div>
+      <div class="field"><label>Senha</label><input type="password" id="l-pw" placeholder="••••••••" autocomplete="current-password"></div>
+      <div class="field" style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="remember-me" style="width:18px;height:18px;margin:0">
+        <label style="margin:0;font-size:12px;color:var(--t2)">Lembrar-me</label>
+      </div>
+      <button class="btn bg" style="margin-top:8px" onclick="doLogin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="17" height="17"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Entrar
+      </button>
+    </div>
+    <div class="af" id="af-register">
+      <div class="field"><label>Nome Completo</label><input type="text" id="r-nm" placeholder="Ex: João Machava" autocomplete="name"></div>
+      <div class="field"><label>Telemóvel</label><div class="pfx"><input type="tel" id="r-ph" placeholder="84 000 0000" maxlength="9" autocomplete="off"></div></div>
+      <div class="field"><label>Criar Senha</label><input type="password" id="r-pw" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div>
+      <div class="field"><label>Código de Convite (opcional)</label><input type="text" id="r-rf" placeholder="Ex: SAL-ABC12"></div>
+      <button class="btn bg" style="margin-top:4px" onclick="doRegister()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="17" height="17"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Criar Conta
+      </button>
+      <p class="terms">Ao registar concordas com os <a href="#">Termos de Uso</a> da Sasol.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MAIN APP -->
+<div class="screen" id="sapp">
+  <!-- HOME -->
+  <div class="page active pw" id="pg-home">
+    <div class="hh">
+      <div class="htop">
+        <div>
+          <div class="hgreet">Bem-vindo de volta,</div>
+          <div class="hname fd" id="d-name">—</div>
+          <div style="font-size:12px;color:var(--t2);margin-top:2px" id="d-phone">—</div>
+        </div>
+        <div class="hlvl" onclick="goDeposit()">
+          <div class="hlvl-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div class="hlvl-lbl" id="d-lvl-name">Sem nível</div>
+          <div class="hlvl-num" id="d-lvl-num"></div>
+        </div>
+      </div>
+      <div class="bc">
+        <div class="bcl">Saldo Disponível</div>
+        <div class="bca"><span id="d-bal">0</span> <span>MT</span></div>
+        <div class="bcs">
+          <div><div class="bsl">Total Ganho</div><div class="bsv up" id="d-earned">0 MT</div></div>
+          <div><div class="bsl">Comissão</div><div class="bsv gd" id="d-comm">0 MT</div></div>
+          <div><div class="bsl">Ganho/Dia</div><div class="bsv up" id="d-daily">+0 MT</div></div>
+        </div>
+        <div class="bccd">
+          <div class="bccl">⏱ Próximo rendimento (20%/dia)</div>
+          <div class="bcct" id="d-countdown">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="qa">
+      <div class="qi" onclick="goDeposit()"><div class="qi-ic" style="background:var(--gd)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><span class="qi-lb">Depositar</span></div>
+      <div class="qi" onclick="openWithdraw()"><div class="qi-ic" style="background:var(--rd)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div><span class="qi-lb">Sacar</span></div>
+      <div class="qi" onclick="goPage('pg-invite')"><div class="qi-ic" style="background:var(--pd)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="qi-lb">Convidar</span></div>
+      <div class="qi" onclick="goPage('pg-como')"><div class="qi-ic" style="background:var(--bd)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><span class="qi-lb">Como Funciona</span></div>
+    </div>
+    <div class="sec" style="margin-top:18px"><div id="home-notice"></div></div>
+    <div class="sec" style="margin-top:10px"><div class="stitle"><div class="dot"></div>Tarefa do Dia</div><div id="task-area"></div></div>
+    <div class="sec" style="margin-top:18px"><div class="stitle"><div class="dot"></div>Actividade Recente</div><div id="live-feed"></div></div>
+  </div>
+
+  <!-- DEPOSIT PAGES -->
+  <div class="page pw" id="pg-deposit"><div class="dh"><h2>Escolha o Nível</h2><p>Selecciona o nível que quer activar</p></div><div class="lvl-grid" id="lvl-grid"></div><div style="height:20px"></div></div>
+  <div class="page pw" id="pg-dep-confirm"><div class="dh"><h2>Confirmar Nível</h2><p>Revê os detalhes antes de continuar</p></div><div class="dep-confirm" id="dep-confirm-content"></div></div>
+  <div class="page pw" id="pg-dep-payment"><div class="dh"><h2>Realizar Pagamento</h2><p>Transfere e confirma o pagamento</p></div><div style="padding:18px" id="dep-payment-content"></div></div>
+
+  <!-- WALLET -->
+  <div class="page pw" id="pg-wallet">
+    <div class="wh"><div class="whl">Saldo Total</div><div class="wha"><span id="w-bal">0</span> <span>MT</span></div><div style="display:flex;gap:10px;margin-top:14px"><button class="btn bg bsm" onclick="goDeposit()">+ Depositar</button><button class="btn bgh bsm" onclick="openWithdraw()">Sacar</button></div></div>
+    <div id="txn-list" style="margin-top:12px"></div>
+  </div>
+
+  <!-- INVITE -->
+  <div class="page pw" id="pg-invite">
+    <div class="ih"><div class="fd" style="font-size:22px;font-weight:800">Convidar Amigos</div><div style="color:var(--t2);font-size:12px;margin-top:3px">Ganha 150 MT por cada amigo que depositar</div></div>
+    <div style="padding:18px">
+      <div class="ref-card">
+        <div class="rcl">Teu Código Pessoal</div>
+        <div class="rcode" id="r-code">SAL-—</div>
+        <button class="btn bgh bsm" style="width:auto" onclick="copyCode()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copiar Código</button>
+        <div class="rss">
+          <div><div class="rsl">Convidados</div><div class="rsv" id="r-cnt">0</div></div>
+          <div><div class="rsl">Activos</div><div class="rsv" id="r-act">0</div></div>
+          <div><div class="rsl">Ganhos</div><div class="rsv" id="r-earn">0 MT</div></div>
+        </div>
+      </div>
+      <div class="sbtns">
+        <button class="sbtn swa" onclick="shareWA()"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>Partilhar no WhatsApp</button>
+        <button class="sbtn slnk" onclick="copyLink()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copiar Link</button>
+      </div>
+      <div class="stitle" style="margin-bottom:12px">🏆 Top Convidadores</div>
+      <div id="rank-list"></div>
+    </div>
+  </div>
+
+  <!-- COMO FUNCIONA -->
+  <div class="page pw" id="pg-como">
+    <div class="dh" style="background:linear-gradient(160deg,#0a1222,var(--bg))"><h2>Como Funciona</h2><p>Guia completo da plataforma Sasol</p></div>
+    <div style="padding:18px">
+      <div class="cf-card"><h4>📋 Visão Geral</h4>
+        <div class="cf-step"><div class="cf-num">1</div><div class="cf-txt">Regista-te com nome, telemóvel e senha. É gratuito e rápido.</div></div>
+        <div class="cf-step"><div class="cf-num">2</div><div class="cf-txt">Escolhe um <strong>nível de depósito</strong> (Nível 1 a 5) e efectua o pagamento via M-Pesa ou e-Mola.</div></div>
+        <div class="cf-step"><div class="cf-num">3</div><div class="cf-txt">Após aprovação, o teu saldo é activado com <strong>20% de rendimento diário automático</strong>.</div></div>
+        <div class="cf-step"><div class="cf-num">4</div><div class="cf-txt">Completa a <strong>tarefa diária</strong> (partilhar o link) para ganhar bónus extra.</div></div>
+        <div class="cf-step"><div class="cf-num">5</div><div class="cf-txt">Convida amigos e ganha <strong>150 MT de comissão</strong> por cada referido activo.</div></div>
+        <div class="cf-step"><div class="cf-num">6</div><div class="cf-txt">Podes sacar <strong>48 horas após</strong> o depósito ser aprovado, acima do mínimo do teu nível.</div></div>
+        <div class="cf-step"><div class="cf-num">7</div><div class="cf-txt">Cada nível permite <strong>10 saques</strong>. Após o 10.º saque, renova o nível para continuar a sacar.</div></div>
+      </div>
+      <div class="cf-card"><h4>🏆 Tabela de Níveis</h4>
+        <table class="lvl-table">
+          <tr><th>Nível</th><th>Depósito</th><th>Ganho/Dia</th><th>Saque Mín.</th></tr>
+          <tr><td>Nível 1</td><td>300 MT</td><td>60 MT</td><td>150 MT</td></tr>
+          <tr><td>Nível 2</td><td>600 MT</td><td>120 MT</td><td>300 MT</td></tr>
+          <tr><td>Nível 3</td><td>1.000 MT</td><td>200 MT</td><td>500 MT</td></tr>
+          <tr><td>Nível 4</td><td>2.000 MT</td><td>400 MT</td><td>1.000 MT</td></tr>
+          <tr><td>Nível 5</td><td>3.000 MT</td><td>600 MT</td><td>1.500 MT</td></tr>
+        </table>
+      </div>
+      <div class="cf-card"><h4>📲 Tarefa Diária</h4>
+        <div class="cf-step"><div class="cf-num">1</div><div class="cf-txt">Todos os dias aparece uma tarefa de <strong>partilhar o link</strong> de convite.</div></div>
+        <div class="cf-step"><div class="cf-num">2</div><div class="cf-txt">Ao clicar, és redirecionado ao WhatsApp com a mensagem e o teu código já incluídos.</div></div>
+        <div class="cf-step"><div class="cf-num">3</div><div class="cf-txt">Ao partilhar, ganhas <strong>30 MT</strong> de bónus automaticamente.</div></div>
+      </div>
+      <div class="cf-card"><h4>💰 Regras de Saque</h4>
+        <div class="cf-step"><div class="cf-num">1</div><div class="cf-txt">Podes sacar <strong>48 horas</strong> após o depósito ser aprovado pelo admin.</div></div>
+        <div class="cf-step"><div class="cf-num">2</div><div class="cf-txt">O valor mínimo de saque depende do teu nível activo.</div></div>
+        <div class="cf-step"><div class="cf-num">3</div><div class="cf-txt">Cada pedido de saque passa por <strong>aprovação manual</strong> do admin.</div></div>
+        <div class="cf-step"><div class="cf-num">4</div><div class="cf-txt">Recebe directamente no M-Pesa ou e-Mola que indicares.</div></div>
+        <div class="cf-step"><div class="cf-num" style="background:var(--yd);border-color:var(--gold);color:var(--gold)">5</div><div class="cf-txt">Cada nível permite no máximo <strong>10 saques</strong>. Ao atingir o limite, deves <strong>renovar o nível</strong> para continuar a sacar. O contador reinicia automaticamente após renovação.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="page pw" id="pg-profile">
+    <div class="ph">
+      <div class="pav" id="p-av">?</div>
+      <div class="pname fd" id="p-nm">—</div>
+      <div class="pphone" id="p-ph">—</div>
+      <div class="pbadge" id="p-badge"><svg viewBox="0 0 24 24" fill="currentColor" width="11" height="11"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> SEM NÍVEL</div>
+    </div>
+    <div style="padding:0 0 20px">
+      <div class="pmenu">
+        <div class="pmtitle">Conta</div>
+        <div class="pmi" onclick="goPage('pg-wallet')"><div class="pmi-ic" style="background:var(--gd)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" width="16" height="16"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="pmi-tx"><div class="pmi-t">Carteira e Histórico</div><div class="pmi-s">Todas as movimentações</div></div><div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg></div></div>
+        <div class="pmi" onclick="goPage('pg-como')"><div class="pmi-ic" style="background:var(--bd)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><div class="pmi-tx"><div class="pmi-t">Como Funciona</div><div class="pmi-s">Guia completo da plataforma</div></div><div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg></div></div>
+      </div>
+      <div class="pmenu">
+        <div class="pmtitle">Suporte</div>
+        <div class="pmi" onclick="contactSupport()"><div class="pmi-ic" style="background:#25d36618"><svg viewBox="0 0 24 24" fill="none" stroke="#25d366" stroke-width="2" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="pmi-tx"><div class="pmi-t">Suporte WhatsApp</div><div class="pmi-s">Fala connosco agora</div></div><div class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg></div></div>
+      </div>
+      <div class="pmenu"><button class="btn br" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="17" height="17"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair da Conta</button></div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="bnav n5" id="bnav">
+    <button class="ni active" id="n-home" onclick="goPage('pg-home');setNav('n-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Início</button>
+    <button class="ni" id="n-wallet" onclick="goPage('pg-wallet');setNav('n-wallet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Carteira</button>
+    <button class="ni" id="n-dep" onclick="goDeposit();setNav('n-dep')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Depósito</button>
+    <button class="ni" id="n-invite" onclick="goPage('pg-invite');setNav('n-invite')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Convites</button>
+    <button class="ni" id="n-profile" onclick="goPage('pg-profile');setNav('n-profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Perfil</button>
+  </nav>
+</div>
+
+<!-- ADMIN -->
+<div class="screen" id="sad">
+  <div class="adh">
+    <div class="adt fd">Painel Admin — Sasol</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
+      <div class="adb2">⚠ ADMIN</div>
+      <div class="live-badge"><div class="live-dot"></div> TEMPO REAL</div>
+    </div>
+    <div class="adh-row">
+      <div style="font-size:10px;color:var(--t2)" id="ad-sync-info">Em tempo real</div>
+      <button class="btn bgh bsm" onclick="doLogout()">← Sair</button>
+    </div>
+  </div>
+  <div class="adstats">
+    <div class="adstat"><div class="adstat-ic" style="background:var(--gd)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" width="18" height="18"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="adstat-v" id="ad-users">0</div><div class="adstat-l">Utilizadores</div></div>
+    <div class="adstat"><div class="adstat-ic" style="background:var(--yd)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" width="18" height="18"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="adstat-v" id="ad-pdep" style="color:var(--gold)">0</div><div class="adstat-l">Dep. Pendentes</div></div>
+    <div class="adstat"><div class="adstat-ic" style="background:var(--rd)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" width="18" height="18"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div><div class="adstat-v" id="ad-pwth" style="color:var(--red)">0</div><div class="adstat-l">Saques Pend.</div></div>
+    <div class="adstat"><div class="adstat-ic" style="background:var(--bd)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" width="18" height="18"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="adstat-v" id="ad-vol">0</div><div class="adstat-l">Volume Total</div></div>
+  </div>
+  <div class="adtabs">
+    <button class="adtab active" onclick="adTab('deps')">💰 Depósitos</button>
+    <button class="adtab" onclick="adTab('wths')">💸 Saques</button>
+    <button class="adtab" onclick="adTab('users')">👥 Utilizadores</button>
+    <button class="adtab" onclick="adTab('new')">🆕 Novas Adesões</button>
+  </div>
+  <div class="page active" style="padding-bottom:20px"><div class="adcontent" id="ad-content"></div></div>
+</div>
+
+<!-- MODALS -->
+<div class="mo" id="mo-withdraw">
+  <div class="mb">
+    <div class="mh"></div>
+    <div class="mt">💸 Pedido de Saque</div>
+    <div id="wth-info"></div>
+    <div class="field"><label>Valor a Sacar (MT)</label><input type="number" id="w-amt" placeholder="Ver mínimo acima"></div>
+    <div class="field"><label>Método de Recebimento</label><select id="w-method"><option value="mpesa">M-Pesa</option><option value="emola">e-Mola</option></select></div>
+    <div class="field"><label>Número para Receber</label><div class="pfx"><input type="tel" id="w-ph" placeholder="84 000 0000" maxlength="9"></div></div>
+    <button class="btn bg" onclick="submitWithdraw()">Confirmar Pedido</button>
+    <button class="btn bgh" style="margin-top:8px" onclick="closeMo('mo-withdraw')">Cancelar</button>
+  </div>
+</div>
+
+<div class="mo" id="mo-admin">
+  <div class="mb">
+    <div class="mh"></div>
+    <div class="mt">🔐 Acesso Admin</div>
+    <div class="field"><label>Senha</label><input type="password" id="adm-pw" placeholder="••••••••"></div>
+    <button class="btn br" onclick="doAdminLogin()">Entrar como Admin</button>
+    <button class="btn bgh" style="margin-top:8px" onclick="closeMo('mo-admin')">Cancelar</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// CONFIGURAÇÃO DOS NÍVEIS
+// ════════════════════════════════════════════
+const LEVELS = [
+  {id:1, name:'Nível 1', color:'lc1', deposit:300, daily:60, minWithdraw:150},
+  {id:2, name:'Nível 2', color:'lc2', deposit:600, daily:120, minWithdraw:300},
+  {id:3, name:'Nível 3', color:'lc3', deposit:1000, daily:200, minWithdraw:500},
+  {id:4, name:'Nível 4', color:'lc4', deposit:2000, daily:400, minWithdraw:1000},
+  {id:5, name:'Nível 5', color:'lc5', deposit:3000, daily:600, minWithdraw:1500}
+];
+const ADMIN_PW = 'admin2024';
+const STORAGE_KEY = 'sasol_user_session';
+
+// ════════════════════════════════════════════
+// ESTADO GLOBAL
+// ════════════════════════════════════════════
+const STATE = {
+  user: null,
+  users: [],
+  deposits: [],
+  withdrawals: [],
+  selLevel: null,
+  selMethod: 'mpesa',
+  listeners: [],
+  feedTimer: null,
+  countdownTimer: null,
+  adminTimer: null
+};
+
+// ════════════════════════════════════════════
+// PERSISTÊNCIA DE LOGIN (localStorage)
+// ════════════════════════════════════════════
+function saveSession(userId, phone, remember = true) {
+  if (remember) {
+    const session = {
+      userId: userId,
+      phone: phone,
+      timestamp: Date.now(),
+      expiresAt: Date.now() + (30 * 24 * 60 * 60 * 1000) // 30 dias
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+    console.log('Session saved to localStorage');
+  } else {
+    // Session storage apenas para esta sessão (fecha navegador limpa)
+    const session = {
+      userId: userId,
+      phone: phone,
+      timestamp: Date.now(),
+      expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 horas
+    };
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+    console.log('Session saved to sessionStorage');
+  }
+}
+
+function getSavedSession() {
+  // Primeiro verificar localStorage
+  let sessionData = localStorage.getItem(STORAGE_KEY);
+  if (sessionData) {
+    try {
+      const session = JSON.parse(sessionData);
+      if (session.expiresAt > Date.now()) {
+        return session;
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch(e) {}
+  }
+  
+  // Depois verificar sessionStorage
+  sessionData = sessionStorage.getItem(STORAGE_KEY);
+  if (sessionData) {
+    try {
+      const session = JSON.parse(sessionData);
+      if (session.expiresAt > Date.now()) {
+        return session;
+      } else {
+        sessionStorage.removeItem(STORAGE_KEY);
+      }
+    } catch(e) {}
+  }
+  
+  return null;
+}
+
+function clearSession() {
+  localStorage.removeItem(STORAGE_KEY);
+  sessionStorage.removeItem(STORAGE_KEY);
+  console.log('Session cleared');
+}
+
+async function tryAutoLogin() {
+  const savedSession = getSavedSession();
+  if (!savedSession || !savedSession.userId) {
+    console.log('No saved session found');
+    return false;
+  }
+  
+  console.log('Found saved session for user:', savedSession.userId);
+  
+  try {
+    await loadFirebaseData();
+    const user = STATE.users.find(u => u.id === savedSession.userId);
+    if (user) {
+      console.log('Auto-login successful for:', user.name);
+      loginUser(user);
+      return true;
+    } else {
+      console.log('User not found in Firebase, clearing session');
+      clearSession();
+      return false;
+    }
+  } catch (error) {
+    console.error('Auto-login error:', error);
+    return false;
+  }
+}
+
+// ════════════════════════════════════════════
+// FUNÇÕES FIREBASE - CORE
+// ════════════════════════════════════════════
+async function loadFirebaseData() {
+  try {
+    const db = window.firebaseDB;
+    const ref = window.firebaseRef;
+    const get = window.firebaseGet;
+    const child = window.firebaseChild;
+    
+    // Carregar utilizadores
+    const usersSnap = await get(child(ref(db), 'users'));
+    if (usersSnap.exists()) {
+      STATE.users = Object.values(usersSnap.val());
+    } else {
+      STATE.users = [];
+    }
+    
+    // Carregar depósitos
+    const depsSnap = await get(child(ref(db), 'deposits'));
+    if (depsSnap.exists()) {
+      STATE.deposits = Object.values(depsSnap.val());
+    } else {
+      STATE.deposits = [];
+    }
+    
+    // Carregar saques
+    const wthsSnap = await get(child(ref(db), 'withdrawals'));
+    if (wthsSnap.exists()) {
+      STATE.withdrawals = Object.values(wthsSnap.val());
+    } else {
+      STATE.withdrawals = [];
+    }
+    
+    console.log('Firebase data loaded:', {
+      users: STATE.users.length,
+      deposits: STATE.deposits.length,
+      withdrawals: STATE.withdrawals.length
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error loading Firebase data:', error);
+    toast('Erro ao carregar dados do Firebase', 'err');
+    return false;
+  }
+}
+
+async function saveUserToFirebase(user) {
+  try {
+    const db = window.firebaseDB;
+    const ref = window.firebaseRef;
+    const set = window.firebaseSet;
+    await set(ref(db, `users/${user.id}`), user);
+    console.log('User saved to Firebase:', user.id);
+    return true;
+  } catch (error) {
+    console.error('Error saving user:', error);
+    toast('Erro ao salvar no Firebase', 'err');
+    return false;
+  }
+}
+
+async function saveDepositToFirebase(deposit) {
+  try {
+    const db = window.firebaseDB;
+    const ref = window.firebaseRef;
+    const set = window.firebaseSet;
+    await set(ref(db, `deposits/${deposit.id}`), deposit);
+    console.log('Deposit saved to Firebase:', deposit.id);
+    return true;
+  } catch (error) {
+    console.error('Error saving deposit:', error);
+    toast('Erro ao salvar depósito no Firebase', 'err');
+    return false;
+  }
+}
+
+async function saveWithdrawalToFirebase(withdrawal) {
+  try {
+    const db = window.firebaseDB;
+    const ref = window.firebaseRef;
+    const set = window.firebaseSet;
+    await set(ref(db, `withdrawals/${withdrawal.id}`), withdrawal);
+    console.log('Withdrawal saved to Firebase:', withdrawal.id);
+    return true;
+  } catch (error) {
+    console.error('Error saving withdrawal:', error);
+    toast('Erro ao salvar saque no Firebase', 'err');
+    return false;
+  }
+}
+
+async function updateUserInFirebase(userId, updates) {
+  try {
+    const db = window.firebaseDB;
+    const ref = window.firebaseRef;
+    const update = window.firebaseUpdate;
+    await update(ref(db, `users/${userId}`), updates);
+    console.log('User updated in Firebase:', userId);
+    return true;
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return false;
+  }
+}
+
+// Setup real-time listeners
+function setupRealtimeListeners() {
+  const db = window.firebaseDB;
+  const ref = window.firebaseRef;
+  const onValue = window.firebaseOnValue;
+  
+  // Listen for users changes
+  const usersRef = ref(db, 'users');
+  onValue(usersRef, (snapshot) => {
+    if (snapshot.exists()) {
+      STATE.users = Object.values(snapshot.val());
+      console.log('Users updated in real-time:', STATE.users.length);
+      if (STATE.user) {
+        const updatedUser = STATE.users.find(u => u.id === STATE.user.id);
+        if (updatedUser) {
+          STATE.user = updatedUser;
+          renderApp();
+        }
+      }
+      if (document.getElementById('sad').classList.contains('active')) {
+        adStats();
+        renderAdContent();
+      }
+    }
+  });
+  
+  // Listen for deposits changes
+  const depsRef = ref(db, 'deposits');
+  onValue(depsRef, (snapshot) => {
+    if (snapshot.exists()) {
+      STATE.deposits = Object.values(snapshot.val());
+      console.log('Deposits updated in real-time:', STATE.deposits.length);
+      if (STATE.user) {
+        renderApp();
+      }
+      if (document.getElementById('sad').classList.contains('active')) {
+        adStats();
+        renderAdContent();
+      }
+    }
+  });
+  
+  // Listen for withdrawals changes
+  const wthsRef = ref(db, 'withdrawals');
+  onValue(wthsRef, (snapshot) => {
+    if (snapshot.exists()) {
+      STATE.withdrawals = Object.values(snapshot.val());
+      console.log('Withdrawals updated in real-time:', STATE.withdrawals.length);
+      if (STATE.user) {
+        renderApp();
+      }
+      if (document.getElementById('sad').classList.contains('active')) {
+        adStats();
+        renderAdContent();
+      }
+    }
+  });
+  
+  console.log('Real-time listeners setup complete');
+}
+
+// ════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════
+function toast(msg, type = 'inf') {
+  const c = document.getElementById('tc');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.style.opacity = '0', 2800);
+  setTimeout(() => t.remove(), 3200);
+}
+
+// ════════════════════════════════════════════
+// NAVEGAÇÃO
+// ════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goPage(id) {
+  document.querySelectorAll('#sapp .page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const map = {
+    'pg-home': 'n-home',
+    'pg-wallet': 'n-wallet',
+    'pg-deposit': 'n-dep',
+    'pg-invite': 'n-invite',
+    'pg-profile': 'n-profile'
+  };
+  if (map[id]) setNav(map[id]);
+}
+
+function setNav(id) {
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+function goDeposit() {
+  renderLevelGrid();
+  goPage('pg-deposit');
+  setNav('n-dep');
+}
+
+function closeMo(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+document.querySelectorAll('.mo').forEach(o => o.addEventListener('click', e => {
+  if (e.target === o) o.classList.remove('active');
+}));
+
+// ════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════
+function authTab(t) {
+  document.querySelectorAll('.at').forEach((el, i) => {
+    el.classList.toggle('active', (t === 'login' && i === 0) || (t === 'register' && i === 1));
+  });
+  document.querySelectorAll('.af').forEach((el, i) => {
+    el.classList.toggle('active', (t === 'login' && i === 0) || (t === 'register' && i === 1));
+  });
+}
+
+async function doRegister() {
+  const nm = document.getElementById('r-nm').value.trim();
+  const ph = document.getElementById('r-ph').value.trim();
+  const pw = document.getElementById('r-pw').value;
+  const rf = document.getElementById('r-rf').value.trim().toUpperCase();
+  
+  if (!nm || !ph || !pw) return toast('Preenche todos os campos', 'err');
+  if (ph.length < 8) return toast('Número inválido', 'err');
+  if (pw.length < 6) return toast('Senha mínima 6 caracteres', 'err');
+  
+  await loadFirebaseData();
+  
+  if (STATE.users.find(u => u.phone === ph)) return toast('Número já registado', 'err');
+  
+  let refUser = null;
+  if (rf) {
+    refUser = STATE.users.find(u => u.code === rf);
+    if (!refUser) return toast('Código de convite inválido', 'err');
+  }
+  
+  const code = 'SAL-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+  const newUser = {
+    id: Date.now(),
+    name: nm,
+    phone: ph,
+    pass: pw,
+    code: code,
+    balance: 0,
+    totalEarned: 0,
+    commission: 0,
+    level: 0,
+    activeDeposits: [],
+    lastDailyPaid: 0,
+    taskDone: false,
+    taskDate: '',
+    refs: 0,
+    refsActive: 0,
+    refEarnings: 0,
+    joinDate: new Date().toLocaleDateString('pt'),
+    joinTs: Date.now(),
+    withdrawCount: 0
+  };
+  
+  await saveUserToFirebase(newUser);
+  
+  if (refUser) {
+    refUser.refs = (refUser.refs || 0) + 1;
+    refUser.balance += 150;
+    refUser.commission += 150;
+    refUser.totalEarned += 150;
+    refUser.refEarnings = (refUser.refEarnings || 0) + 150;
+    await updateUserInFirebase(refUser.id, {
+      refs: refUser.refs,
+      balance: refUser.balance,
+      commission: refUser.commission,
+      totalEarned: refUser.totalEarned,
+      refEarnings: refUser.refEarnings
+    });
+    
+    const refReward = {
+      id: Date.now(),
+      userId: refUser.id,
+      userName: refUser.name,
+      userPhone: refUser.phone,
+      amount: 150,
+      method: 'referral',
+      status: 'approved',
+      date: Date.now(),
+      isReward: true,
+      isRef: true,
+      note: `Comissão referido: ${nm}`
+    };
+    await saveDepositToFirebase(refReward);
+  }
+  
+  await loadFirebaseData();
+  toast('Conta criada! 🎉', 'ok');
+  
+  // Auto-login após registro
+  const remember = document.getElementById('remember-me')?.checked || true;
+  saveSession(newUser.id, newUser.phone, remember);
+  setTimeout(() => loginUser(newUser), 700);
+}
+
+async function doLogin() {
+  const ph = document.getElementById('l-ph').value.trim();
+  const pw = document.getElementById('l-pw').value;
+  const remember = document.getElementById('remember-me')?.checked || true;
+  
+  if (ph === 'admin') {
+    openAdminLogin();
+    return;
+  }
+  
+  await loadFirebaseData();
+  const u = STATE.users.find(u => u.phone === ph && u.pass === pw);
+  if (!u) return toast('Número ou senha incorrectos', 'err');
+  
+  // Salvar sessão
+  saveSession(u.id, u.phone, remember);
+  
+  loginUser(u);
+}
+
+function loginUser(u) {
+  STATE.user = u;
+  applyDailyEarnings(u);
+  renderApp();
+  showScreen('sapp');
+  goPage('pg-home');
+  startCountdown();
+  startFeed();
+}
+
+function doLogout() {
+  STATE.user = null;
+  clearInterval(STATE.feedTimer);
+  clearInterval(STATE.countdownTimer);
+  clearInterval(STATE.adminTimer);
+  clearSession();
+  showScreen('sa');
+}
+
+// ════════════════════════════════════════════
+// RENDER APP
+// ════════════════════════════════════════════
+function renderApp() {
+  const u = STATE.user;
+  if (!u) return;
+  
+  const lv = LEVELS.find(l => l.id === u.level);
+  
+  document.getElementById('d-name').textContent = u.name;
+  document.getElementById('d-phone').textContent = '+258 ' + u.phone;
+  document.getElementById('d-bal').textContent = fmt(u.balance);
+  document.getElementById('d-earned').textContent = fmt(u.totalEarned) + ' MT';
+  document.getElementById('d-comm').textContent = fmt(u.commission) + ' MT';
+  document.getElementById('d-daily').textContent = '+' + (lv ? fmt(lv.daily) : 0) + ' MT';
+  document.getElementById('d-lvl-name').textContent = lv ? lv.name : 'Sem nível';
+  document.getElementById('d-lvl-num').textContent = lv ? 'Nível ' + lv.id : '—';
+  document.getElementById('w-bal').textContent = fmt(u.balance);
+  document.getElementById('r-code').textContent = u.code;
+  document.getElementById('r-cnt').textContent = u.refs || 0;
+  document.getElementById('r-act').textContent = u.refsActive || 0;
+  document.getElementById('r-earn').textContent = fmt(u.refEarnings || 0) + ' MT';
+  document.getElementById('p-av').textContent = u.name.charAt(0).toUpperCase();
+  document.getElementById('p-nm').textContent = u.name;
+  document.getElementById('p-ph').textContent = '+258 ' + u.phone;
+  document.getElementById('p-badge').innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="11" height="11"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> ${lv ? lv.name.toUpperCase() : 'SEM NÍVEL'}`;
+  
+  renderHomeNotice(lv);
+  renderTask(lv);
+  renderTxns();
+  renderRanking();
+}
+
+function renderHomeNotice(lv) {
+  const el = document.getElementById('home-notice');
+  if (!lv) {
+    el.innerHTML = `<div class="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><p><strong>Activa o teu nível</strong> para começar a ganhar <strong>20%/dia</strong> e aceder às tarefas.</p></div>`;
+  } else {
+    el.innerHTML = `<div class="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><p><strong>Saque mínimo: ${fmt(lv.minWithdraw)} MT</strong> · Disponível 48h após depósito aprovado · 20%/dia activo · Máx. 10 saques por nível.</p></div>`;
+  }
+}
+
+function renderTask(lv) {
+  const el = document.getElementById('task-area');
+  const u = STATE.user;
+  const today = new Date().toDateString();
+  const done = u.taskDone && u.taskDate === today;
+  
+  if (!lv) {
+    el.innerHTML = `<div class="nlw"><div class="nlw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h3>Nível não activado</h3><p>Faz o teu primeiro depósito para desbloquear as tarefas diárias e começar a ganhar.</p><button class="btn bg" onclick="goDeposit()">Activar Nível</button></div>`;
+    return;
+  }
+  
+  el.innerHTML = `<div class="tc2"><div class="thdr"><div class="tic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16,6 12,2 8,6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div><div style="font-weight:700;font-size:13px">Partilhar o Link</div><div style="font-size:11px;color:var(--t2)">Convida 1 amigo hoje</div></div><div class="trw">+30 MT</div></div><div class="tpb"><div class="tpbi" style="width:${done ? '100%' : '0%'}"></div></div><div class="tmeta"><span>${done ? '1/1 concluído' : '0/1 pendente'}</span><span style="color:${done ? 'var(--green)' : 'var(--gold)'}">${done ? 'Concluída ✓' : 'Pendente'}</span></div><button class="btn ${done ? 'bgh' : 'bbl'}" style="margin-top:8px;font-size:12px" onclick="doTask()" ${done ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>${done ? 'Tarefa Concluída' : 'Partilhar no WhatsApp'}</button></div>`;
+}
+
+function renderTxns() {
+  const u = STATE.user;
+  const el = document.getElementById('txn-list');
+  
+  const userDeps = STATE.deposits.filter(d => d.userId === u.id);
+  const userWths = STATE.withdrawals.filter(w => w.userId === u.id);
+  
+  const all = [
+    ...userDeps.map(d => ({ ...d, cat: d.isReward ? 'rwd' : (d.isRef ? 'ref' : 'dep'), sign: '+' })),
+    ...userWths.map(w => ({ ...w, cat: 'wth', sign: '-' }))
+  ];
+  all.sort((a, b) => b.date - a.date);
+  
+  if (!all.length) {
+    el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>Nenhuma movimentação ainda</p></div>`;
+    return;
+  }
+  
+  const labels = { dep: 'Depósito', rwd: 'Rendimento 20%/dia', ref: 'Comissão Referido', wth: 'Saque' };
+  const methods = { mpesa: 'M-Pesa', emola: 'e-Mola', reward: 'Sistema', referral: 'Sistema', ref: 'Sistema' };
+  
+  el.innerHTML = all.map(t => `<div class="txn"><div class="txi ${t.cat}"><svg viewBox="0 0 24 24" fill="${t.cat === 'rwd' ? 'var(--gold)' : 'none'}" stroke="${t.cat === 'rwd' ? 'none' : 'currentColor'}" stroke-width="2.5">${t.cat === 'dep' ? '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' : t.cat === 'wth' ? '<path d="M5 12h14M12 5l7 7-7 7"/>' : t.cat === 'rwd' ? '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>' : '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>'}</svg></div><div class="txi2"><div class="txtype">${labels[t.cat] || 'Transacção'} — ${methods[t.method] || t.method || '—'}</div><div class="txdate">${new Date(t.date).toLocaleDateString('pt')} ${new Date(t.date).toLocaleTimeString('pt', { hour: '2-digit', minute: '2-digit' })}</div>${t.note ? `<div class="txdate">${t.note}</div>` : ''}<span class="txst st-${t.status === 'pending' ? 'p' : t.status === 'approved' ? 'a' : 'r'}">${t.status === 'pending' ? 'Pendente' : t.status === 'approved' ? 'Aprovado' : 'Rejeitado'}</span></div><div class="txamt ${t.sign === '+' ? 'pos' : 'neg'}">${t.sign}${fmt(t.amount)} MT</div></div>`).join('');
+}
+
+function renderRanking() {
+  const el = document.getElementById('rank-list');
+  if (!el) return;
+  
+  const ranking = [...STATE.users]
+    .sort((a, b) => (b.refEarnings || 0) - (a.refEarnings || 0))
+    .slice(0, 10);
+  
+  if (!ranking.length) {
+    el.innerHTML = `<div class="empty"><p>Nenhum convidador ainda</p></div>`;
+    return;
+  }
+  
+  const medals = ['gd', 'sv', 'br'];
+  el.innerHTML = ranking.map((u, idx) => `<div class="rank-item"><div class="rpos ${medals[idx] || ''}">${idx + 1}</div><div class="rinfo"><div class="rname">${u.name}</div><div class="rrefs">${u.refs || 0} referidos</div></div><div class="rearn">${fmt(u.refEarnings || 0)} MT</div></div>`).join('');
+}
+
+// ════════════════════════════════════════════
+// DEPÓSITOS
+// ════════════════════════════════════════════
+function renderLevelGrid() {
+  const u = STATE.user;
+  const el = document.getElementById('lvl-grid');
+  el.innerHTML = LEVELS.map(l => `<div class="lvl-card ${u && u.level === l.id ? 'active-lvl' : ''}" onclick="selectLevel(${l.id})">${u && u.level === l.id ? '<div class="lvl-current-tag">Activo</div>' : ''}<div class="lvl-top"><div class="lvl-badge"><div class="lvl-num ${l.color}">${l.id}</div><div><div class="lvl-name">${l.name}</div><div class="lvl-sub">Rendimento diário garantido</div></div></div><div><div class="lvl-price">${fmt(l.deposit)}<span> MT</span></div></div></div><div class="lvl-stats"><div><div class="lvl-stat-l">Ganho/Dia</div><div class="lvl-stat-v" style="color:var(--green)">+${fmt(l.daily)} MT</div></div><div><div class="lvl-stat-l">Saque Mín.</div><div class="lvl-stat-v">${fmt(l.minWithdraw)} MT</div></div><div><div class="lvl-stat-l">Rendimento</div><div class="lvl-stat-v">20%/dia</div></div></div></div>`).join('');
+}
+
+function selectLevel(id) {
+  STATE.selLevel = LEVELS.find(l => l.id === id);
+  renderDepConfirm();
+  goPage('pg-dep-confirm');
+}
+
+function renderDepConfirm() {
+  const l = STATE.selLevel;
+  if (!l) return;
+  document.getElementById('dep-confirm-content').innerHTML = `<div class="dep-confirm-card"><div class="dep-confirm-lvl">${l.name} seleccionado</div><div class="dep-confirm-name">${l.name}</div><div class="dep-confirm-price">${fmt(l.deposit)}<span> MT</span></div><div class="dep-confirm-stats"><div><div class="dcs-l">Ganho Diário</div><div class="dcs-v">+${fmt(l.daily)} MT</div></div><div><div class="dcs-l">Saque Mínimo</div><div class="dcs-v">${fmt(l.minWithdraw)} MT</div></div><div><div class="dcs-l">Rendimento</div><div class="dcs-v">20% / dia</div></div><div><div class="dcs-l">Prazo Saque</div><div class="dcs-v">48h após dep.</div></div></div></div><div class="rules-card"><h4>📋 Resumo das Regras</h4><div class="rule"><div class="rule-dot"></div><p>Depositando <strong>${fmt(l.deposit)} MT</strong>, o teu saldo activa rendimento de <strong>20% ao dia (${fmt(l.daily)} MT/dia)</strong>.</p></div><div class="rule"><div class="rule-dot"></div><p>O saque mínimo neste nível é de <strong>${fmt(l.minWithdraw)} MT</strong>.</p></div><div class="rule"><div class="rule-dot"></div><p>Podes sacar <strong>48 horas</strong> após o depósito ser aprovado pelo admin.</p></div><div class="rule"><div class="rule-dot"></div><p>Só podes ter <strong>um nível activo</strong> de cada vez. Novo depósito actualiza o nível.</p></div><div class="rule"><div class="rule-dot"></div><p>A tarefa diária de <strong>partilhar o link</strong> dá +30 MT por dia.</p></div><div class="rule"><div class="rule-dot" style="background:var(--gold)"></div><p>⚠ Após <strong>10 saques</strong>, é obrigatório <strong>renovar o nível</strong> para continuar a sacar. A renovação reinicia o contador.</p></div></div><button class="btn bg" onclick="proceedToPayment()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="17" height="17"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>Confirmar e Ver Pagamento</button><button class="btn bgh" style="margin-top:8px" onclick="goPage('pg-deposit')">← Voltar aos Níveis</button>`;
+}
+
+function proceedToPayment() {
+  renderPayment();
+  goPage('pg-dep-payment');
+}
+
+function renderPayment() {
+  const l = STATE.selLevel;
+  if (!l) return;
+  document.getElementById('dep-payment-content').innerHTML = `<div style="background:var(--gd2);border:1px solid #00cc8825;border-radius:var(--rs);padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:12px;color:var(--t2)">A depositar:</span><span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--green)">${fmt(l.deposit)} MT — ${l.name}</span></div><div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em">Escolhe o método</div><div class="m-method"><div class="mm sel" id="mm-mpesa" onclick="selPayMethod('mpesa')"><div class="mm-logo mp-logo">M-Pesa</div><div class="mm-name">M-Pesa</div><div class="mm-sub">Vodacom</div></div><div class="mm" id="mm-emola" onclick="selPayMethod('emola')"><div class="mm-logo em-logo">e-Mola</div><div class="mm-name">e-Mola</div><div class="mm-sub">Movitel</div></div></div><div id="pay-info-mpesa" class="pay-card"><h4>📱 Dados M-Pesa</h4><div class="prow"><span class="prl">Número</span><span class="prv">858 167 382 <button class="cpb" onclick="cpy('858167382')">Copiar</button></span></div><div class="prow"><span class="prl">Nome</span><span class="prv">Wilder Augusto</span></div><div class="prow"><span class="prl">Valor Exacto</span><span class="prv" style="color:var(--green)">${fmt(l.deposit)} MT</span></div></div><div id="pay-info-emola" class="pay-card hidden"><h4>📱 Dados e-Mola</h4><div class="prow"><span class="prl">Número</span><span class="prv">875 073 208 <button class="cpb" onclick="cpy('875073208')">Copiar</button></span></div><div class="prow"><span class="prl">Nome</span><span class="prv">Wilder Augusto</span></div><div class="prow"><span class="prl">Valor Exacto</span><span class="prv" style="color:var(--green)">${fmt(l.deposit)} MT</span></div></div><div class="field"><label>Número que fez a transferência</label><div class="pfx"><input type="tel" id="dp-from" placeholder="84 000 0000" maxlength="9"></div></div><div class="field"><label>ID / Referência da Transacção</label><input type="text" id="dp-ref" placeholder="Ex: 1234567890"></div><button class="btn bg" onclick="submitDeposit()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="17" height="17"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>Enviar Comprovativo</button><button class="btn bgh" style="margin-top:8px" onclick="goPage('pg-dep-confirm')">← Voltar</button>`;
+}
+
+function selPayMethod(m) {
+  STATE.selMethod = m;
+  document.getElementById('mm-mpesa').classList.toggle('sel', m === 'mpesa');
+  document.getElementById('mm-emola').classList.toggle('sel', m === 'emola');
+  document.getElementById('pay-info-mpesa').classList.toggle('hidden', m !== 'mpesa');
+  document.getElementById('pay-info-emola').classList.toggle('hidden', m !== 'emola');
+}
+
+async function submitDeposit() {
+  const u = STATE.user;
+  const l = STATE.selLevel;
+  const from = document.getElementById('dp-from').value.trim();
+  const ref = document.getElementById('dp-ref').value.trim();
+  
+  if (!from) return toast('Indica o número que pagou', 'err');
+  if (!ref) return toast('Indica o ID da transacção', 'err');
+  
+  const deposit = {
+    id: Date.now(),
+    userId: u.id,
+    userName: u.name,
+    userPhone: u.phone,
+    levelId: l.id,
+    levelName: l.name,
+    amount: l.deposit,
+    method: STATE.selMethod,
+    fromPhone: from,
+    ref: ref,
+    status: 'pending',
+    date: Date.now()
+  };
+  
+  await saveDepositToFirebase(deposit);
+  toast('Pedido enviado! Admin aprovará em breve ✓', 'ok');
+  goPage('pg-home');
+  setNav('n-home');
+}
+
+// ════════════════════════════════════════════
+// SAQUES
+// ════════════════════════════════════════════
+function openWithdraw() {
+  const u = STATE.user;
+  const lv = LEVELS.find(l => l.id === u.level);
+  const el = document.getElementById('wth-info');
+  
+  if (!lv) {
+    el.innerHTML = `<div class="notice" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><p>Activa primeiro o teu nível para poder sacar.</p></div>`;
+  } else {
+    const userDeps = STATE.deposits.filter(d => d.userId === u.id && d.status === 'approved' && d.approvedAt && !d.isReward && !d.isRef);
+    const earliest = userDeps.length ? Math.min(...userDeps.map(d => d.approvedAt)) : 0;
+    const hrs = earliest ? ((Date.now() - earliest) / 3600000) : 0;
+    const hoursLeft = Math.max(0, Math.ceil(48 - hrs));
+    
+    const wCount = u.withdrawCount || 0;
+    const restantes = 10 - wCount;
+    const alertColor = restantes <= 3 ? 'var(--red)' : restantes <= 5 ? 'var(--gold)' : 'var(--blue)';
+    const renovAlert = restantes <= 0
+      ? `<div class="notice" style="margin-bottom:10px;border-color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><p style="color:var(--red)"><strong>Limite atingido!</strong> Já realizaste 10 saques neste nível. Renova o teu nível para continuar a sacar.</p></div>`
+      : restantes <= 3
+      ? `<div class="notice" style="margin-bottom:10px;border-color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><p style="color:var(--gold)"><strong>Atenção!</strong> Restam apenas <strong>${restantes} saque(s)</strong> antes de precisares renovar o teu nível.</p></div>`
+      : '';
+    el.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px"><div class="lim-stat"><div class="lim-stat-v">${fmt(lv.minWithdraw)} MT</div><div class="lim-stat-l">Mínimo (${lv.name})</div></div><div class="lim-stat"><div class="lim-stat-v" style="color:${hoursLeft === 0 ? 'var(--green)' : 'var(--gold)'}">${hoursLeft === 0 ? 'Disponível' : hoursLeft + 'h rest.'}</div><div class="lim-stat-l">Prazo 48h</div></div><div class="lim-stat"><div class="lim-stat-v" style="color:${alertColor}">${wCount}/10</div><div class="lim-stat-l">Saques usados</div></div></div>${renovAlert}<div class="notice" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><p>Saque mínimo: <strong>${fmt(lv.minWithdraw)} MT</strong>. Disponível ${hoursLeft === 0 ? 'agora' : hoursLeft + 'h após depósito aprovado'}. Saldo actual: <strong>${fmt(u.balance)} MT</strong>.</p></div>`;
+  }
+  document.getElementById('mo-withdraw').classList.add('active');
+}
+
+async function submitWithdraw() {
+  const u = STATE.user;
+  const lv = LEVELS.find(l => l.id === u.level);
+  const amt = parseFloat(document.getElementById('w-amt').value);
+  const method = document.getElementById('w-method').value;
+  const ph = document.getElementById('w-ph').value.trim();
+  
+  if (!lv) return toast('Activa um nível primeiro', 'err');
+  if (!amt || amt < lv.minWithdraw) return toast(`Mínimo é ${fmt(lv.minWithdraw)} MT`, 'err');
+  if (amt > u.balance) return toast('Saldo insuficiente', 'err');
+  if (!ph) return toast('Indica o número para receber', 'err');
+  
+  // ── LIMITE DE 10 SAQUES POR NÍVEL ──
+  const wCount = u.withdrawCount || 0;
+  if (wCount >= 10) {
+    closeMo('mo-withdraw');
+    toast('⚠ Limite de 10 saques atingido. Renova o teu nível para continuar.', 'err');
+    setTimeout(() => goDeposit(), 1500);
+    return;
+  }
+  
+  const userDeps = STATE.deposits.filter(d => d.userId === u.id && d.status === 'approved' && d.approvedAt && !d.isReward && !d.isRef);
+  if (!userDeps.length) return toast('Nenhum depósito aprovado ainda', 'err');
+  
+  const earliest = Math.min(...userDeps.map(d => d.approvedAt));
+  const hrs = (Date.now() - earliest) / 3600000;
+  if (hrs < 48) {
+    const h = Math.ceil(48 - hrs);
+    return toast(`Aguarda mais ${h}h para sacar`, 'err');
+  }
+  
+  const withdrawal = {
+    id: Date.now(),
+    userId: u.id,
+    userName: u.name,
+    userPhone: u.phone,
+    amount: amt,
+    method: method,
+    toPhone: ph,
+    status: 'pending',
+    date: Date.now()
+  };
+  
+  await saveWithdrawalToFirebase(withdrawal);
+  
+  // Incrementar contador de saques
+  u.withdrawCount = wCount + 1;
+  await updateUserInFirebase(u.id, { withdrawCount: u.withdrawCount });
+  
+  closeMo('mo-withdraw');
+  const restantes = 10 - u.withdrawCount;
+  if (restantes <= 3 && restantes > 0) {
+    toast(`Pedido enviado ✓ — Atenção: restam apenas ${restantes} saque(s) antes de renovar o nível!`, 'ok');
+  } else if (restantes === 0) {
+    toast('Último saque enviado! Renova o teu nível para continuar a sacar.', 'ok');
+  } else {
+    toast('Pedido de saque enviado! A aguardar aprovação ✓', 'ok');
+  }
+}
+
+// ════════════════════════════════════════════
+// TAREFA DIÁRIA
+// ════════════════════════════════════════════
+async function doTask() {
+  const u = STATE.user;
+  const today = new Date().toDateString();
+  
+  if (u.taskDone && u.taskDate === today) return toast('Tarefa já feita hoje', 'inf');
+  
+  const msg = encodeURIComponent(`🌟 Olá! Junta-te ao *Sasol* — o clube de poupança digital em Moçambique!\n\n💰 Deposita e ganha 20%/dia\n🎯 Tarefas diárias com bónus\n👥 Convida e ganha 150 MT por referido\n\n✅ Usa o meu código: *${u.code}*\n🔗 Acede aqui: https://sasolmz.netlify.app/\n📲 Regista já e começa a ganhar!`);
+  window.open(`https://wa.me/?text=${msg}`, '_blank');
+  
+  u.taskDone = true;
+  u.taskDate = today;
+  u.balance += 30;
+  u.totalEarned += 30;
+  
+  await updateUserInFirebase(u.id, {
+    taskDone: true,
+    taskDate: today,
+    balance: u.balance,
+    totalEarned: u.totalEarned
+  });
+  
+  const taskReward = {
+    id: Date.now(),
+    userId: u.id,
+    userName: u.name,
+    userPhone: u.phone,
+    amount: 30,
+    method: 'reward',
+    status: 'approved',
+    date: Date.now(),
+    isReward: true,
+    note: 'Tarefa diária: partilha de link'
+  };
+  await saveDepositToFirebase(taskReward);
+  
+  toast('+30 MT creditados por completar tarefa! 🎉', 'ok');
+}
+
+// ════════════════════════════════════════════
+// RENDIMENTO DIÁRIO
+// ════════════════════════════════════════════
+async function applyDailyEarnings(u) {
+  const lv = LEVELS.find(l => l.id === u.level);
+  if (!lv) return;
+  
+  const last = u.lastDailyPaid || 0;
+  const hrs = (Date.now() - last) / 3600000;
+  if (hrs < 24) return;
+  
+  u.balance += lv.daily;
+  u.totalEarned += lv.daily;
+  u.lastDailyPaid = Date.now();
+  
+  await updateUserInFirebase(u.id, {
+    balance: u.balance,
+    totalEarned: u.totalEarned,
+    lastDailyPaid: u.lastDailyPaid
+  });
+  
+  const dailyReward = {
+    id: Date.now(),
+    userId: u.id,
+    userName: u.name,
+    userPhone: u.phone,
+    amount: lv.daily,
+    method: 'reward',
+    status: 'approved',
+    date: Date.now(),
+    isReward: true,
+    note: `Rendimento diário — ${lv.name}`
+  };
+  await saveDepositToFirebase(dailyReward);
+  
+  toast(`🎉 +${fmt(lv.daily)} MT de rendimento diário creditados!`, 'ok');
+}
+
+function startCountdown() {
+  clearInterval(STATE.countdownTimer);
+  STATE.countdownTimer = setInterval(() => {
+    const u = STATE.user;
+    if (!u) return;
+    const lv = LEVELS.find(l => l.id === u.level);
+    const el = document.getElementById('d-countdown');
+    if (!el) return;
+    
+    if (!lv) {
+      el.textContent = 'Sem nível activo';
+      return;
+    }
+    
+    const last = u.lastDailyPaid || 0;
+    const next = last + (24 * 3600000);
+    const ms = Math.max(0, next - Date.now());
+    
+    if (ms <= 0) {
+      applyDailyEarnings(u);
+      renderApp();
+      el.textContent = 'Próximo em 24h';
+      return;
+    }
+    
+    const h = Math.floor(ms / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }, 1000);
+}
+
+function pad(n) {
+  return String(n).padStart(2, '0');
+}
+
+// ════════════════════════════════════════════
+// LIVE FEED
+// ════════════════════════════════════════════
+const FEED_NAMES = ['Maria S.', 'João M.', 'Ana P.', 'Carlos B.', 'Sadia O.', 'Fátima L.', 'Pedro N.', 'Rosa C.', 'Manuel A.', 'Beatriz T.'];
+const FEED_ACTS = [
+  n => `<strong>${n}</strong> depositou <span style="color:var(--green)">${[300, 600, 1000, 2000, 3000][Math.floor(Math.random() * 5)]} MT</span>`,
+  n => `<strong>${n}</strong> sacou <span style="color:var(--red)">${[150, 300, 500, 1000][Math.floor(Math.random() * 4)]} MT</span>`,
+  n => `<strong>${n}</strong> ganhou <span style="color:var(--gold)">+${[30, 60, 100, 200, 300][Math.floor(Math.random() * 5)]} MT</span> de tarefa`,
+  n => `<strong>${n}</strong> convidou um amigo e ganhou <span style="color:var(--purple)">150 MT</span>`,
+];
+const FEED_ICONS = ['var(--green)', 'var(--red)', 'var(--gold)', 'var(--purple)'];
+
+function startFeed() {
+  const el = document.getElementById('live-feed');
+  if (!el) return;
+  clearInterval(STATE.feedTimer);
+  addFeedItem();
+  STATE.feedTimer = setInterval(addFeedItem, 120000);
+}
+
+function addFeedItem() {
+  const el = document.getElementById('live-feed');
+  if (!el) return;
+  const n = FEED_NAMES[Math.floor(Math.random() * FEED_NAMES.length)];
+  const ai = Math.floor(Math.random() * FEED_ACTS.length);
+  const fi = document.createElement('div');
+  fi.className = 'fi';
+  fi.innerHTML = `<div class="fa" style="background:${FEED_ICONS[ai]}20;color:${FEED_ICONS[ai]}">${n.charAt(0)}</div><div class="ft">${FEED_ACTS[ai](n)}</div><span class="ftime">agora</span>`;
+  el.insertBefore(fi, el.firstChild);
+  if (el.children.length > 5) el.lastChild.remove();
+}
+
+// ════════════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════════════
+function openAdminLogin() {
+  document.getElementById('mo-admin').classList.add('active');
+}
+
+async function doAdminLogin() {
+  if (document.getElementById('adm-pw').value !== ADMIN_PW) return toast('Senha incorrecta', 'err');
+  closeMo('mo-admin');
+  await loadFirebaseData();
+  adStats();
+  adTab('deps');
+  showScreen('sad');
+  toast('Bem-vindo, Admin! Actualização em tempo real.', 'ok');
+  document.getElementById('ad-sync-info').textContent = 'Em tempo real — ' + new Date().toLocaleTimeString('pt');
+}
+
+let _adTab = 'deps';
+
+function adTab(t) {
+  _adTab = t;
+  document.querySelectorAll('.adtab').forEach((el, i) => {
+    el.classList.toggle('active', ['deps', 'wths', 'users', 'new'][i] === t);
+  });
+  renderAdContent();
+}
+
+function adStats() {
+  document.getElementById('ad-users').textContent = STATE.users.length;
+  document.getElementById('ad-pdep').textContent = STATE.deposits.filter(d => d.status === 'pending' && !d.isReward && !d.isRef).length;
+  document.getElementById('ad-pwth').textContent = STATE.withdrawals.filter(w => w.status === 'pending').length;
+  const vol = STATE.deposits.filter(d => d.status === 'approved' && !d.isReward && !d.isRef).reduce((s, d) => s + d.amount, 0);
+  document.getElementById('ad-vol').textContent = fmt(vol) + ' MT';
+}
+
+function renderAdContent() {
+  const c = document.getElementById('ad-content');
+  
+  if (_adTab === 'deps') {
+    const pd = STATE.deposits.filter(d => d.status === 'pending' && !d.isReward && !d.isRef).sort((a, b) => b.date - a.date);
+    if (!pd.length) {
+      c.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><p>Nenhum depósito pendente</p></div>`;
+      return;
+    }
+    c.innerHTML = pd.map(d => `<div class="adr"><div class="adr-top"><div><div class="adr-n">${d.userName}</div><div class="adr-ph">+258 ${d.userPhone} · ${d.method === 'mpesa' ? 'M-Pesa' : 'e-Mola'}</div><div class="adr-info">${d.levelName} · Ref: ${d.ref} · De: +258 ${d.fromPhone}</div><div class="adr-info">${new Date(d.date).toLocaleDateString('pt')} ${new Date(d.date).toLocaleTimeString('pt', { hour: '2-digit', minute: '2-digit' })}</div></div><div style="text-align:right"><div class="adr-amt" style="color:var(--green)">+${fmt(d.amount)} MT</div></div></div><div class="adr-btns"><button class="apb" onclick="appDep(${d.id})">✓ Aprovar</button><button class="reb" onclick="rejDep(${d.id})">✗ Rejeitar</button></div></div>`).join('');
+  } else if (_adTab === 'wths') {
+    const pw = STATE.withdrawals.filter(w => w.status === 'pending').sort((a, b) => b.date - a.date);
+    if (!pw.length) {
+      c.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg><p>Nenhum saque pendente</p></div>`;
+      return;
+    }
+    c.innerHTML = pw.map(w => `<div class="adr"><div class="adr-top"><div><div class="adr-n">${w.userName}</div><div class="adr-ph">+258 ${w.userPhone}</div><div class="adr-info">Enviar para: +258 ${w.toPhone} · ${w.method === 'mpesa' ? 'M-Pesa' : 'e-Mola'}</div><div class="adr-info">${new Date(w.date).toLocaleDateString('pt')} ${new Date(w.date).toLocaleTimeString('pt', { hour: '2-digit', minute: '2-digit' })}</div></div><div style="text-align:right"><div class="adr-amt" style="color:var(--red)">-${fmt(w.amount)} MT</div></div></div><div class="adr-btns"><button class="apb" onclick="appWth(${w.id})">✓ Aprovar</button><button class="reb" onclick="rejWth(${w.id})">✗ Rejeitar</button></div></div>`).join('');
+  } else if (_adTab === 'users') {
+    if (!STATE.users.length) {
+      c.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><p>Nenhum utilizador registado</p></div>`;
+      return;
+    }
+    const sorted = [...STATE.users].sort((a, b) => (b.joinTs || 0) - (a.joinTs || 0));
+    c.innerHTML = sorted.map(u => {
+      const lv = LEVELS.find(l => l.id === u.level);
+      return `<div class="adr"><div class="adr-top"><div><div class="adr-n">${u.name}</div><div class="adr-ph">+258 ${u.phone} · ${u.code}</div><div class="adr-info">Registado: ${u.joinDate} · ${u.refs || 0} referidos · ${lv ? lv.name : 'Sem nível'}</div></div><div style="text-align:right"><div class="adr-amt" style="color:var(--green)">${fmt(u.balance)} MT</div><div style="font-size:10px;color:var(--t2)">${lv ? '+' + fmt(lv.daily) + ' MT/dia' : '—'}</div></div></div></div>`;
+    }).join('');
+  } else {
+    const cutoff = Date.now() - 72 * 3600000;
+    const recent = [...STATE.users].filter(u => (u.joinTs || 0) > cutoff).sort((a, b) => b.joinTs - a.joinTs);
+    if (!recent.length) {
+      c.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg><p>Nenhuma nova adesão nas últimas 72h</p></div>`;
+      return;
+    }
+    c.innerHTML = `<div style="font-size:11px;color:var(--t2);margin-bottom:12px;padding:0 2px">Novas adesões nas últimas 72h — ${recent.length} utilizador${recent.length !== 1 ? 'es' : ''}</div>` + recent.map(u => {
+      const ago = timeSince(u.joinTs || Date.now());
+      const lv = LEVELS.find(l => l.id === u.level);
+      return `<div class="new-card"><div class="new-av">${u.name.charAt(0).toUpperCase()}</div><div class="new-info"><div class="new-n">${u.name}</div><div class="new-ph">+258 ${u.phone} · ${u.code}</div><div class="new-time">Registado ${ago}${lv ? ' · ' + lv.name : ' · Sem nível'}</div></div></div>`;
+    }).join('');
+  }
+}
+
+function timeSince(ts) {
+  const ms = Date.now() - ts;
+  const m = Math.floor(ms / 60000);
+  const h = Math.floor(ms / 3600000);
+  if (m < 1) return 'agora mesmo';
+  if (m < 60) return m + 'm atrás';
+  if (h < 24) return h + 'h atrás';
+  return Math.floor(h / 24) + 'd atrás';
+}
+
+async function appDep(id) {
+  await loadFirebaseData();
+  const d = STATE.deposits.find(d => d.id === id);
+  if (!d) return;
+  
+  d.status = 'approved';
+  d.approvedAt = Date.now();
+  await saveDepositToFirebase(d);
+  
+  const u = STATE.users.find(u => u.id === d.userId);
+  if (u) {
+    u.balance += d.amount;
+    u.totalEarned += d.amount;
+    u.level = d.levelId;
+    await updateUserInFirebase(u.id, {
+      balance: u.balance,
+      totalEarned: u.totalEarned,
+      level: u.level
+    });
+    
+    if (u.refs > 0 && u.refsActive !== u.refs) {
+      await updateUserInFirebase(u.id, { refsActive: u.refs });
+    }
+  }
+  
+  // Reset contador de saques quando novo nível é aprovado
+  if (u) {
+    await updateUserInFirebase(u.id, { withdrawCount: 0 });
+  }
+  
+  await loadFirebaseData();
+  adStats();
+  renderAdContent();
+  toast(`✓ ${u ? u.name : ''} — ${d.levelName} aprovado!`, 'ok');
+}
+
+async function rejDep(id) {
+  await loadFirebaseData();
+  const d = STATE.deposits.find(d => d.id === id);
+  if (!d) return;
+  d.status = 'rejected';
+  await saveDepositToFirebase(d);
+  await loadFirebaseData();
+  adStats();
+  renderAdContent();
+  toast('Depósito rejeitado', 'err');
+}
+
+async function appWth(id) {
+  await loadFirebaseData();
+  const w = STATE.withdrawals.find(w => w.id === id);
+  if (!w) return;
+  
+  const u = STATE.users.find(u => u.id === w.userId);
+  if (u) {
+    if (u.balance < w.amount) return toast('Saldo insuficiente', 'err');
+    u.balance -= w.amount;
+    await updateUserInFirebase(u.id, { balance: u.balance });
+  }
+  
+  w.status = 'approved';
+  await saveWithdrawalToFirebase(w);
+  await loadFirebaseData();
+  adStats();
+  renderAdContent();
+  toast(`✓ Saque ${fmt(w.amount)} MT aprovado! Enviar para +258 ${w.toPhone}`, 'ok');
+}
+
+async function rejWth(id) {
+  await loadFirebaseData();
+  const w = STATE.withdrawals.find(w => w.id === id);
+  if (!w) return;
+  w.status = 'rejected';
+  await saveWithdrawalToFirebase(w);
+  await loadFirebaseData();
+  adStats();
+  renderAdContent();
+  toast('Saque rejeitado', 'err');
+}
+
+// ════════════════════════════════════════════
+// CONVIDAR
+// ════════════════════════════════════════════
+function shareWA() {
+  const u = STATE.user;
+  const msg = encodeURIComponent(`🌟 Olá! Junta-te ao *Sasol* — clube de poupança digital!\n\n💰 Ganha 20% ao dia\n✅ Código: *${u.code}*\n🔗 https://sasolmz.netlify.app/`);
+  window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
+
+function copyLink() {
+  const u = STATE.user;
+  navigator.clipboard.writeText(`Sasol — código ${u.code}\n🔗 https://sasolmz.netlify.app/`).then(() => toast('Link copiado!', 'ok'));
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(STATE.user.code).then(() => toast('Código copiado!', 'ok'));
+}
+
+function contactSupport() {
+  window.open('https://wa.me/258858167382?text=Olá, preciso de suporte Sasol', '_blank');
+}
+
+// ════════════════════════════════════════════
+// PWA INSTALL PROMPT
+// ════════════════════════════════════════════
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const installPrompt = document.getElementById('install-prompt');
+  if (installPrompt) {
+    installPrompt.style.display = 'flex';
+  }
+});
+
+document.getElementById('install-btn')?.addEventListener('click', async () => {
+  const installPrompt = document.getElementById('install-prompt');
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+    }
+    deferredPrompt = null;
+    if (installPrompt) installPrompt.style.display = 'none';
+  }
+});
+
+document.getElementById('close-ip')?.addEventListener('click', () => {
+  const installPrompt = document.getElementById('install-prompt');
+  if (installPrompt) installPrompt.style.display = 'none';
+});
+
+// ════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════
+function fmt(n) {
+  return Number(n || 0).toLocaleString('pt');
+}
+
+function cpy(t) {
+  navigator.clipboard.writeText(t).then(() => toast('Copiado!', 'ok'));
+}
+
+// ════════════════════════════════════════════
+// INICIALIZAÇÃO
+// ════════════════════════════════════════════
+(async () => {
+  // Aguardar Firebase estar disponível
+  const waitForFirebase = () => {
+    return new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (window.firebaseDB) {
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 100);
+    });
+  };
+  
+  await waitForFirebase();
+  console.log('Firebase inicializado com sucesso!');
+  
+  // Carregar dados e configurar listeners em tempo real
+  await loadFirebaseData();
+  setupRealtimeListeners();
+  
+  // Tentar auto-login com sessão salva
+  const autoLoginSuccess = await tryAutoLogin();
+  
+  // Esconder loading
+  setTimeout(() => {
+    document.getElementById('s-load').classList.remove('active');
+    if (!autoLoginSuccess || !STATE.user) {
+      showScreen('sa');
+    }
+  }, 1500);
+})();
+</script>
+</body>
+</html>
