@@ -1418,7 +1418,7 @@ async function doTask() {
   
   if (u.taskDone && u.taskDate === today) return toast('Tarefa já feita hoje', 'inf');
   
-  const msg = encodeURIComponent(`🌟 Olá! Junta-te ao *Sasol* — o clube de poupança digital em Moçambique!\n\n💰 Deposita e ganha 20%/dia\n🎯 Tarefas diárias com bónus\n👥 Convida e ganha 150 MT por referido\n\n✅ Usa o meu código: *${u.code}*\n🔗 Acede aqui: https://effulgent-mandazi-6ff710.netlify.app/\n📲 Regista já e começa a ganhar!`);
+  const msg = encodeURIComponent(`🌟 Olá! Junta-te ao *Sasol* — o clube de poupança digital em Moçambique!\n\n💰 Deposita e ganha 20%/dia\n🎯 Tarefas diárias com bónus\n👥 Convida e ganha 150 MT por referido\n\n✅ Usa o meu código: *${u.code}*\n🔗 Acede aqui: https://sasolmozambique-q0qu.onrender.com/\n📲 Regista já e começa a ganhar!`);
   window.open(`https://wa.me/?text=${msg}`, '_blank');
   
   u.taskDone = true;
@@ -1729,13 +1729,13 @@ async function rejWth(id) {
 // ════════════════════════════════════════════
 function shareWA() {
   const u = STATE.user;
-  const msg = encodeURIComponent(`🌟 Olá! Junta-te ao *Sasol* — clube de poupança digital!\n\n💰 Ganha 20% ao dia\n✅ Código: *${u.code}*\n🔗 https://effulgent-mandazi-6ff710.netlify.app/`);
+  const msg = encodeURIComponent(`🌟 Olá! Junta-te ao *Sasol* — clube de poupança digital!\n\n💰 Ganha 20% ao dia\n✅ Código: *${u.code}*\n🔗 https://sasolmozambique-q0qu.onrender.com/`);
   window.open(`https://wa.me/?text=${msg}`, '_blank');
 }
 
 function copyLink() {
   const u = STATE.user;
-  navigator.clipboard.writeText(`Sasol — código ${u.code}\n🔗 https://effulgent-mandazi-6ff710.netlify.app/`).then(() => toast('Link copiado!', 'ok'));
+  navigator.clipboard.writeText(`Sasol — código ${u.code}\n🔗 https://sasolmozambique-q0qu.onrender.com/`).then(() => toast('Link copiado!', 'ok'));
 }
 
 function copyCode() {
