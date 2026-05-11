@@ -1418,7 +1418,9 @@ async function appDep(id) {
     u.level=d.levelId;
     u.refsActive=u.refsActive||0;
     if (d.isFirstDeposit) u.refsActive=(u.refsActive||0)+1;
-    await updateUserInFirebase(u.id,{level:u.level,refsActive:u.refsActive,withdrawCount:0});
+    // Definir lastDailyPaid agora para o rendimento começar a contar só a partir de hoje
+    u.lastDailyPaid=Date.now();
+    await updateUserInFirebase(u.id,{level:u.level,refsActive:u.refsActive,withdrawCount:0,lastDailyPaid:u.lastDailyPaid});
   }
   await loadFirebaseData();
   adStats();
