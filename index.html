@@ -1147,20 +1147,28 @@ async function applyDailyEarnings(u) {
 }
 
 // ════════════════════════════════════════════
-// COUNTDOWN
+// COUNTDOWN — 24h desde a aprovação do depósito
 // ════════════════════════════════════════════
 function startCountdown() {
   clearInterval(STATE.countdownTimer);
   function tick() {
-    const now=new Date();
-    const next=new Date();
-    next.setHours(24,0,0,0);
+    const u=STATE.user;
+    const el=document.getElementById('d-countdown');
+    if (!el) return;
+    if (!u||!u.lastDailyPaid) { el.textContent='—'; return; }
+    const now=Date.now();
+    const next=u.lastDailyPaid+(24*60*60*1000);
     const diff=next-now;
+    if (diff<=0) {
+      el.textContent='A processar...';
+      // Aplicar rendimento automaticamente
+      applyDailyEarnings(u).then(()=>{ loadFirebaseData().then(()=>renderApp()); });
+      return;
+    }
     const h=Math.floor(diff/3600000);
     const m=Math.floor((diff%3600000)/60000);
     const s=Math.floor((diff%60000)/1000);
-    const el=document.getElementById('d-countdown');
-    if (el) el.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    el.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
   }
   tick();
   STATE.countdownTimer=setInterval(tick,1000);
@@ -1410,22 +1418,32 @@ async function appDep(id) {
   await loadFirebaseData();
   const d=STATE.deposits.find(d=>d.id==id);
   if (!d) return;
+  const now=Date.now();
   d.status='approved';
-  d.approvedAt=Date.now();
+  d.approvedAt=now;
   await saveDepositToFirebase(d);
   const u=STATE.users.find(u=>u.id===d.userId);
   if (u) {
     u.level=d.levelId;
     u.refsActive=u.refsActive||0;
     if (d.isFirstDeposit) u.refsActive=(u.refsActive||0)+1;
-    // Definir lastDailyPaid agora para o rendimento começar a contar só a partir de hoje
-    u.lastDailyPaid=Date.now();
-    await updateUserInFirebase(u.id,{level:u.level,refsActive:u.refsActive,withdrawCount:0,lastDailyPaid:u.lastDailyPaid});
+    // Saldo do depósito vai imediatamente para o saldo disponível
+    u.balance=(u.balance||0)+d.amount;
+    // Rendimento 20%/dia começa a contar exactamente agora
+    u.lastDailyPaid=now;
+    u.withdrawCount=0;
+    await updateUserInFirebase(u.id,{
+      level:u.level,
+      refsActive:u.refsActive,
+      withdrawCount:0,
+      balance:u.balance,
+      lastDailyPaid:u.lastDailyPaid
+    });
   }
   await loadFirebaseData();
   adStats();
   renderAdContent();
-  toast(`✓ ${u?u.name:''} — ${d.levelName} aprovado!`,'ok');
+  toast(`✓ ${u?u.name:''} — ${d.levelName} aprovado! +${u?u.balance:''} MT no saldo.`,'ok');
 }
 
 async function rejDep(id) {
