@@ -80,6 +80,8 @@
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;overscroll-behavior:none;overscroll-behavior-y:none;touch-action:pan-x pan-y}
 html{overscroll-behavior:none;overscroll-behavior-y:none}
+.page{overscroll-behavior:contain;overscroll-behavior-y:contain;}
+.mb{overscroll-behavior:contain;}
 .fd{font-family:'Sora',sans-serif;font-weight:800}
 .hidden{display:none!important}
 .screen{display:none;height:100vh;flex-direction:column;overflow:hidden}
@@ -1423,7 +1425,7 @@ function contactSupport() {
 function downloadAPK() {
   // Baixar APK directamente
   const a=document.createElement('a');
-  a.href='https://drive.google.com/uc?export=download&id=1luNIodGm27-OTc1nMn5vr2d2c43HIotg';
+  a.href='https://drive.google.com/uc?export=download&id=1qRtJpGvhO3mfVsVqfLaMCVLpn0QZlIhP';
   a.download='SasolMZ.apk';
   document.body.appendChild(a);
   a.click();
@@ -1586,16 +1588,40 @@ document.getElementById('close-ip')?.addEventListener('click',()=>{
 // ════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════
-// Bloquear pull-to-refresh
-let lastY=0;
-document.addEventListener('touchstart',e=>{lastY=e.touches[0].clientY;},{passive:true});
-document.addEventListener('touchmove',e=>{
-  const scrollable=e.target.closest('.page,.mb');
-  if (!scrollable) { e.preventDefault(); return; }
-  const atTop=scrollable.scrollTop<=0;
-  const pullDown=e.touches[0].clientY>lastY;
-  if (atTop&&pullDown) e.preventDefault();
-},{passive:false});
+// Bloquear pull-to-refresh completamente
+document.addEventListener('touchmove', e => {
+  // Permitir scroll apenas dentro de elementos scrolláveis
+  let el = e.target;
+  let scrollable = false;
+  while (el && el !== document.body) {
+    if (el.scrollHeight > el.clientHeight) {
+      const style = window.getComputedStyle(el);
+      const overflow = style.overflow + style.overflowY;
+      if (overflow.includes('auto') || overflow.includes('scroll')) {
+        // Só bloquear se estiver no topo e a puxar para baixo
+        const atTop = el.scrollTop <= 0;
+        const touchY = e.touches[0].clientY;
+        const movingDown = touchY > (el._lastTouchY || touchY);
+        el._lastTouchY = touchY;
+        if (atTop && movingDown) { e.preventDefault(); return; }
+        scrollable = true;
+        break;
+      }
+    }
+    el = el.parentElement;
+  }
+  if (!scrollable) e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchstart', e => {
+  let el = e.target;
+  while (el && el !== document.body) {
+    if (el.scrollHeight > el.clientHeight) {
+      el._lastTouchY = e.touches[0].clientY;
+    }
+    el = el.parentElement;
+  }
+}, { passive: true });
 
 (async()=>{
   await new Promise(resolve=>{
