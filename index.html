@@ -695,7 +695,7 @@ html{overscroll-behavior:none}
 
   <!-- 3 ACTION BUTTONS -->
   <div class="act-row">
-    <button class="act-btn" onclick="goPage('pg-deposit')">
+    <button class="act-btn" onclick="goDeposit()">
       <div class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M12 5v14M5 12l7-7 7 7"/></svg></div>
       <div class="act-lbl">Depositar</div>
     </button>
@@ -904,7 +904,7 @@ html{overscroll-behavior:none}
     <div class="ni-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
     <div class="ni-lb">Carteira</div>
   </button>
-  <button class="ni-fab" onclick="goPage('pg-deposit');setNav('')">
+  <button class="ni-fab" onclick="goDeposit()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="26" height="26"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   </button>
   <button class="ni" id="n-invite" onclick="goPage('pg-invite');setNav('n-invite')">
@@ -1424,7 +1424,7 @@ function selectLevel(id){STATE.selLevel=LEVELS.find(l=>l.id===id);renderDepConfi
 
 function renderDepConfirm(){
   const l=STATE.selLevel;if(!l)return;
-  document.getElementById('dep-confirm-content').innerHTML=`<div class="dep-confirm-card"><div class="dep-confirm-lvl">${l.name} seleccionado</div><div class="dep-confirm-name">${l.name}</div><div class="dep-confirm-price">${fmt(l.deposit)}<span> MT</span></div><div class="dep-confirm-stats"><div><div class="dcs-l">Ganho Diário</div><div class="dcs-v" style="color:var(--green)">+${fmt(l.daily)} MT</div></div><div><div class="dcs-l">Lucro Total</div><div class="dcs-v" style="color:var(--gold)">${fmt(l.totalProfit)} MT</div></div><div><div class="dcs-l">Duração</div><div class="dcs-v" style="color:var(--gold)">${l.durationDays} dias</div></div><div><div class="dcs-l">Saques</div><div class="dcs-v">1 saque no dia ${l.durationDays}</div></div></div></div><div class="rules-card"><h4>📋 Resumo das Regras</h4><div class="rule"><div class="rule-dot"></div><p>Depositando <strong>${fmt(l.deposit)} MT</strong>, activa rendimento de <strong>20% ao dia (${fmt(l.daily)} MT/dia)</strong>.</p></div><div class="rule"><div class="rule-dot"></div><p>Lucro total acumulado: <strong>${fmt(l.totalProfit)} MT</strong> ao fim de ${l.durationDays} dias.</p></div><div class="rule"><div class="rule-dot"></div><p>Saque único disponível <strong>no último dia (dia ${l.durationDays})</strong> do pacote.</p></div><div class="rule"><div class="rule-dot"></div><p>Só podes ter <strong>um VIP activo</strong> de cada vez.</p></div><div class="rule"><div class="rule-dot" style="background:var(--gold)"></div><p>⚠ Após o saque, renova o VIP para continuar a ganhar.</p></div></div><button class="btn bg" onclick="proceedToPayment()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="17" height="17"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>Confirmar e Ver Pagamento</button><button class="btn bgh" style="margin-top:8px" onclick="goPage('pg-deposit')">← Voltar aos VIPs</button>`;
+  document.getElementById('dep-confirm-content').innerHTML=`<div class="dep-confirm-card"><div class="dep-confirm-lvl">${l.name} seleccionado</div><div class="dep-confirm-name">${l.name}</div><div class="dep-confirm-price">${fmt(l.deposit)}<span> MT</span></div><div class="dep-confirm-stats"><div><div class="dcs-l">Ganho Diário</div><div class="dcs-v" style="color:var(--green)">+${fmt(l.daily)} MT</div></div><div><div class="dcs-l">Lucro Total</div><div class="dcs-v" style="color:var(--gold)">${fmt(l.totalProfit)} MT</div></div><div><div class="dcs-l">Duração</div><div class="dcs-v" style="color:var(--gold)">${l.durationDays} dias</div></div><div><div class="dcs-l">Saques</div><div class="dcs-v">1 saque no dia ${l.durationDays}</div></div></div></div><div class="rules-card"><h4>📋 Resumo das Regras</h4><div class="rule"><div class="rule-dot"></div><p>Depositando <strong>${fmt(l.deposit)} MT</strong>, activa rendimento de <strong>20% ao dia (${fmt(l.daily)} MT/dia)</strong>.</p></div><div class="rule"><div class="rule-dot"></div><p>Lucro total acumulado: <strong>${fmt(l.totalProfit)} MT</strong> ao fim de ${l.durationDays} dias.</p></div><div class="rule"><div class="rule-dot"></div><p>Saque único disponível <strong>no último dia (dia ${l.durationDays})</strong> do pacote.</p></div><div class="rule"><div class="rule-dot"></div><p>Só podes ter <strong>um VIP activo</strong> de cada vez.</p></div><div class="rule"><div class="rule-dot" style="background:var(--gold)"></div><p>⚠ Após o saque, renova o VIP para continuar a ganhar.</p></div></div><button class="btn bg" onclick="proceedToPayment()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="17" height="17"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>Confirmar e Ver Pagamento</button><button class="btn bgh" style="margin-top:8px" onclick="goDeposit()">← Voltar aos VIPs</button>`;
 }
 
 function proceedToPayment(){renderPayment();goPage('pg-dep-payment');}
