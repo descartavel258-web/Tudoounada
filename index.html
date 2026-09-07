@@ -1238,7 +1238,7 @@ let _brandTaps=0,_brandTimer=null;
 function handleBrandTap(){
   _brandTaps++;
   clearTimeout(_brandTimer);
-  if(_brandTaps>=5){_brandTaps=0;openAdminLogin();}
+  if(_brandTaps>=5){_brandTaps=0;window.location.href='admin.html';}
   else{_brandTimer=setTimeout(()=>{_brandTaps=0;},1500);}
 }
 
@@ -1247,11 +1247,11 @@ async function doLogin(){
   const pw=document.getElementById('l-pw').value;
   const remember=document.getElementById('remember-me')?.checked||true;
   if(!phRaw)return toast('Indica o número de telemóvel','err');
-  if(phRaw.toLowerCase()==='admin'||phRaw==='0'){openAdminLogin();return;}
+  if(phRaw.toLowerCase()==='admin'||phRaw==='0'){window.location.href='admin.html';return;}
   if(!pw)return toast('Indica a senha','err');
   const ph=phRaw.replace(/[\s\-]/g,'').replace(/^(\+?258)/,'');
   // Disable button during login
-  const btn=document.querySelector('#af-login .btn');
+  const btn=document.querySelector('#af-login .btn.sa-btn');
   if(btn){btn.disabled=true;btn.textContent='A entrar...';}
   if(!window.firebaseDB){
     if(btn){btn.disabled=false;btn.textContent='→ Entrar na Conta';}
